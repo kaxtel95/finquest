@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinQuest RPG AI</title>
+  <title>FinQuest RPG - v1.0.0</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: #070a12; color: #f1f5f9; min-height: 100vh; padding-bottom: 95px; }
     
-    /* Header */
+    /* Top Header */
     .top-header { position: sticky; top: 0; z-index: 40; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #1e293b; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
     .user-pill { display: flex; align-items: center; gap: 10px; }
     .avatar-icon { position: relative; width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 22px; }
@@ -17,11 +17,11 @@
     .main-wrap { max-width: 480px; margin: 0 auto; padding: 16px; }
     .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
     
-    /* IA Coach Widget */
-    .ia-coach-card { background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.2), #0f172a); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
-    .ia-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; padding: 3px 8px; border-radius: 99px; }
+    /* Auth Modal Screen */
+    #auth-overlay { position: fixed; inset: 0; background: #070a12; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+    .auth-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; padding: 24px; max-width: 360px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
     
-    /* Pet Display */
+    /* Pet Box */
     .pet-box { text-align: center; background: radial-gradient(circle at 50% 0%, #1e1b4b, #0f172a); border: 1px solid rgba(99, 102, 241, 0.35); }
     .pet-anim { font-size: 68px; margin: 8px 0; display: inline-block; animation: petFloat 2.4s infinite ease-in-out; }
     @keyframes petFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
@@ -29,42 +29,29 @@
     .bar-track { background: #020617; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 8px; border: 1px solid #1e293b; }
     .bar-fill { background: linear-gradient(90deg, #6366f1, #38bdf8); height: 100%; border-radius: 99px; transition: width 0.4s ease; }
     
-    /* Character Selector */
-    .char-select-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; text-align: center; }
-    .char-card { background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 8px 4px; cursor: pointer; }
-    .char-card.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+    /* Recommendation Card */
+    .rec-box { background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 10px; margin-top: 8px; font-size: 11px; color: #cbd5e1; line-height: 1.4; }
+    .rec-box b { color: #38bdf8; }
     
-    /* Stats */
-    .stats-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-    .stat-chip { background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; }
-    
-    /* Subtabs */
+    /* Navigation */
     .segmented-control { display: flex; background: #020617; border: 1px solid #1e293b; border-radius: 14px; padding: 3px; margin-bottom: 12px; }
     .segment-btn { flex: 1; padding: 8px 0; background: none; border: none; color: #94a3b8; font-size: 11px; font-weight: 700; border-radius: 10px; cursor: pointer; }
     .segment-btn.active { background: #1e293b; color: #fff; }
     
-    /* Buttons */
     .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .btn-quick { background: #020617; border: 1px solid #1e293b; border-radius: 14px; padding: 12px; text-align: left; color: #fff; cursor: pointer; }
     .btn-action-main { background: #6366f1; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
     .btn-action-sm { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
-    .btn-punish { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fb7185; padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; text-align: left; margin-top: 8px; }
     
-    /* Badges */
     .tag { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 99px; text-transform: uppercase; }
     .tag-paid { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     .tag-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
     
-    /* Badge Victoria Misiones */
-    .medal-box { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(99, 102, 241, 0.2)); border: 1px solid #fbbf24; padding: 12px; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-
-    /* Navigation */
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(16px); border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
     .nav-tab { background: none; border: none; color: #64748b; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; cursor: pointer; }
     .nav-tab.active { color: #38bdf8; }
     .nav-icon { font-size: 18px; }
 
-    /* Modal Sheet */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 80; display: none; align-items: flex-end; justify-content: center; padding: 16px; }
     .modal-sheet { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; max-width: 440px; width: 100%; padding: 20px; }
     input, select { width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 10px; color: #fff; font-size: 13px; margin: 4px 0 12px; outline: none; }
@@ -74,7 +61,29 @@
 </head>
 <body>
 
-  <!-- CABECERA -->
+  <!-- PANTALLA DE ACCESO / MULTIUSUARIO -->
+  <div id="auth-overlay">
+    <div class="auth-box">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <span style="font-size: 40px;">🛡️</span>
+        <h2 style="font-size: 18px; font-weight: 800; margin-top: 4px;">FinQuest v1.0.0</h2>
+        <p style="font-size: 11px; color: #94a3b8;">Acceso independiente y protegido</p>
+      </div>
+      
+      <label style="font-size: 11px; color: #94a3b8;">Usuario o Correo</label>
+      <input type="text" id="auth-user" placeholder="ej. alejo@mail.com">
+
+      <label style="font-size: 11px; color: #94a3b8;">Contraseña</label>
+      <input type="password" id="auth-pass" placeholder="••••••••">
+
+      <div style="display: flex; gap: 8px; margin-top: 6px;">
+        <button onclick="handleLogin()" class="btn-action-main" style="flex: 1; padding: 12px;">Iniciar Sesión</button>
+        <button onclick="handleRegister()" class="btn-action-sm" style="flex: 1; padding: 12px;">Crear Cuenta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
   <header class="top-header">
     <div class="user-pill">
       <div class="avatar-icon" id="top-avatar">
@@ -89,344 +98,277 @@
         </div>
       </div>
     </div>
-    <button onclick="resetDataPrompt()" style="background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: 10px; padding: 4px 8px; border-radius: 8px; cursor: pointer;">
-      ⚙️ Reiniciar
-    </button>
+    <div style="display: flex; gap: 4px;">
+      <button onclick="logoutUser()" class="btn-action-sm">Cerrar Sesión</button>
+    </div>
   </header>
 
   <main class="main-wrap">
 
-    <!-- PESTAÑA 1: MASCOTA & ANÁLISIS IA -->
+    <!-- PESTAÑA 1: MASCOTA & COACH -->
     <div id="panel-pet" class="view-section">
-      
-      <!-- WIDGET ANÁLISIS DE IA -->
-      <div class="ia-coach-card">
+      <!-- Widget IA -->
+      <div class="glass-card" style="border-color: rgba(99,102,241,0.4);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span class="ia-chip">🤖 Diagnóstico IA Financiero</span>
-          <span id="ia-alert-badge" class="tag tag-paid">Saludable</span>
+          <span style="font-size: 10px; font-weight: 800; color: #a5b4fc;">🤖 Coach Financiero IA</span>
+          <span id="ia-alert-badge" class="tag tag-paid">Monitoreo Activo</span>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 12px 0; text-align: center;">
-          <div style="background: #020617; padding: 8px; border-radius: 10px;">
-            <span style="font-size: 9px; color: #94a3b8;">Ingresos</span>
-            <div id="kpi-incomes" style="font-size: 12px; font-weight: 800; color: #34d399; margin-top: 2px;">$0</div>
-          </div>
-          <div style="background: #020617; padding: 8px; border-radius: 10px;">
-            <span style="font-size: 9px; color: #94a3b8;">Gastos Pend.</span>
-            <div id="kpi-expenses" style="font-size: 12px; font-weight: 800; color: #f43f5e; margin-top: 2px;">$0</div>
-          </div>
-          <div style="background: #020617; padding: 8px; border-radius: 10px;">
-            <span style="font-size: 9px; color: #94a3b8;">Neto Proyect.</span>
-            <div id="kpi-balance" style="font-size: 12px; font-weight: 800; color: #38bdf8; margin-top: 2px;">$0</div>
-          </div>
-        </div>
-        <p id="ia-advice-text" style="font-size: 11px; color: #cbd5e1; line-height: 1.4;">
-          Cargando tu estrategia de quincena...
+        <p id="ia-advice-text" style="font-size: 11px; color: #cbd5e1; margin-top: 8px; line-height: 1.4;">
+          Calculando balance neto del ciclo...
         </p>
       </div>
 
-      <!-- PET SPRITE -->
+      <!-- Pet -->
       <div class="glass-card pet-box">
-        <span id="pet-status-tag" style="font-size: 10px; font-weight: 800; background: rgba(16,185,129,0.15); color: #34d399; padding: 3px 8px; border-radius: 99px;">
-          Estado: Firme & Activo ⚡
-        </span>
         <div>
           <div class="pet-anim" id="sprite-pet">🥟</div>
         </div>
         <h2 style="font-size: 17px; font-weight: 800;" id="pet-title-name">Empanada Nea</h2>
-        
         <div class="bar-track">
           <div id="bar-xp-fill" class="bar-fill" style="width: 0%;"></div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 5px;">
-          <span>XP: <b id="txt-xp-ratio" style="color: #fff;">0 / 100</b></span>
+          <span>Experiencia: <b id="txt-xp-ratio" style="color: #fff;">0 / 100</b></span>
           <span>Siguiente Nivel</span>
         </div>
       </div>
 
-      <!-- SELECTOR DE PERSONAJES -->
+      <!-- Selector Personaje -->
       <div class="glass-card">
         <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">🎮 Escoge tu Personaje</span>
-        <div class="char-select-grid">
-          <div class="char-card active" id="card-empanada" onclick="setAvatar('🥟', 'Empanada Nea', 'card-empanada')">
-            <div style="font-size: 24px;">🥟</div>
-            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Empanada</div>
-          </div>
-          <div class="char-card" id="card-cafe" onclick="setAvatar('☕', 'Tinto Nea', 'card-cafe')">
-            <div style="font-size: 24px;">☕</div>
-            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Tinto / Cold</div>
-          </div>
-          <div class="char-card" id="card-cono" onclick="setAvatar('🍦', 'Conito Cremoso', 'card-cono')">
-            <div style="font-size: 24px;">🍦</div>
-            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Conito</div>
-          </div>
-          <div class="char-card" id="card-zorro" onclick="setAvatar('🦊', 'Zorro FinTech', 'card-zorro')">
-            <div style="font-size: 24px;">🦊</div>
-            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Zorro</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MATRIZ DE ATRIBUTOS -->
-      <div class="glass-card">
-        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">⚡ Atributos del Avatar</span>
-        <div class="stats-2x2">
-          <div class="stat-chip">
-            <span style="font-size: 10px; color: #94a3b8;">💪 Fuerza (Salud/Gym)</span>
-            <div id="chip-str" style="font-size: 13px; font-weight: 800; color: #f43f5e; margin-top: 2px;">Nv. 1 (10 pts)</div>
-          </div>
-          <div class="stat-chip">
-            <span style="font-size: 10px; color: #94a3b8;">🧠 Intelecto (Estudio/Trabajo)</span>
-            <div id="chip-int" style="font-size: 13px; font-weight: 800; color: #38bdf8; margin-top: 2px;">Nv. 1 (5 pts)</div>
-          </div>
-          <div class="stat-chip">
-            <span style="font-size: 10px; color: #94a3b8;">🎯 Destreza (Moto/Equipos)</span>
-            <div id="chip-dex" style="font-size: 13px; font-weight: 800; color: #fbbf24; margin-top: 2px;">Nv. 1 (15 pts)</div>
-          </div>
-          <div class="stat-chip">
-            <span style="font-size: 10px; color: #94a3b8;">✨ Espíritu (Perro/Hogar)</span>
-            <div id="chip-spi" style="font-size: 13px; font-weight: 800; color: #34d399; margin-top: 2px;">Nv. 1 (10 pts)</div>
-          </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; text-align: center;">
+          <div class="char-card" onclick="setAvatar('🥟', 'Empanada Nea')"><div style="font-size: 24px;">🥟</div><span style="font-size: 9px;">Empanada</span></div>
+          <div class="char-card" onclick="setAvatar('☕', 'Tinto Nea')"><div style="font-size: 24px;">☕</div><span style="font-size: 9px;">Tinto</span></div>
+          <div class="char-card" onclick="setAvatar('🍦', 'Conito')"><div style="font-size: 24px;">🍦</div><span style="font-size: 9px;">Conito</span></div>
+          <div class="char-card" onclick="setAvatar('🦊', 'Zorro')"><div style="font-size: 24px;">🦊</div><span style="font-size: 9px;">Zorro</span></div>
         </div>
       </div>
     </div>
 
-    <!-- PESTAÑA 2: GASTOS (ORGANIZADOS: PENDIENTES PRIMERO, PAGADOS AL FINAL) -->
+    <!-- PESTAÑA 2: GASTOS -->
     <div id="panel-expenses" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div>
-          <h2 style="font-size: 16px; font-weight: 800;">Control de Salidas</h2>
-          <p style="font-size: 11px; color: #94a3b8;">Pendientes en foco; lo pagado va al final</p>
-        </div>
-        <button class="btn-action-main" onclick="openNewExpenseModal()">+ Gasto</button>
+        <h2 style="font-size: 16px; font-weight: 800;">Salidas</h2>
+        <button class="btn-action-main" onclick="openExpenseModal()">+ Gasto</button>
       </div>
 
       <div class="segmented-control">
-        <button class="segment-btn active" id="btn-subtab-recurrent" onclick="switchExpenseSubtab('recurrent')">📅 Recurrentes (Fijos)</button>
-        <button class="segment-btn" id="btn-subtab-daily" onclick="switchExpenseSubtab('daily')">☕ Diarios & Hormiga</button>
+        <button class="segment-btn active" id="btn-subtab-recurrent" onclick="switchExpenseSubtab('recurrent')">📅 Recurrentes</button>
+        <button class="segment-btn" id="btn-subtab-daily" onclick="switchExpenseSubtab('daily')">☕ Diarios</button>
       </div>
 
-      <button class="btn-punish" onclick="applyDirectPunishment()">
-        🚨 Sanción: Despilfarro / Pérdida de tiempo (-20% HP)
-      </button>
+      <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">⚠️ Pendientes</span>
+      <div id="expenses-pending-box" style="display: flex; flex-direction: column; gap: 8px; margin: 6px 0 16px;"></div>
 
-      <!-- SECCIÓN 1: PENDIENTES (EN FOCO) -->
-      <div style="margin-top: 14px;">
-        <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">⚠️ Pendientes de Pago</span>
-        <div id="expenses-pending-box" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;"></div>
-      </div>
-
-      <!-- SECCIÓN 2: PAGADOS (AL FINAL PLEGABLE) -->
-      <div style="margin-top: 20px;">
-        <span style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase;">✅ Aprobados / Pagados del Mes</span>
-        <div id="expenses-paid-box" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;"></div>
-      </div>
+      <span style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase;">✅ Pagados</span>
+      <div id="expenses-paid-box" style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;"></div>
     </div>
 
     <!-- PESTAÑA 3: INGRESOS -->
     <div id="panel-income" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
-        <h2 style="font-size: 16px; font-weight: 800;">Gestión de Ingresos</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Registra tus entradas o alertas de cobro</p>
+        <h2 style="font-size: 16px; font-weight: 800;">Ingresos</h2>
       </div>
 
       <div class="glass-card">
-        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Valores Habituales</span>
         <div class="grid-btns">
           <button class="btn-quick" onclick="addIncomePrompt('Quincena 1 (Q1)', 3800000)">
             <span style="font-size: 10px; color: #94a3b8;">Días 1-5</span>
-            <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-top: 2px;">+ Q1 Base</div>
+            <div style="font-size: 14px; font-weight: 800; color: #34d399;">+ Q1 Base</div>
           </button>
           <button class="btn-quick" onclick="addIncomePrompt('Quincena 2 (Q2)', 3600000)">
             <span style="font-size: 10px; color: #94a3b8;">Mitad de mes</span>
-            <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-top: 2px;">+ Q2 Base</div>
-          </button>
-          <button class="btn-quick" onclick="addIncomePrompt('Docencia Universidad', 1200000)">
-            <span style="font-size: 10px; color: #94a3b8;">Cátedra</span>
-            <div style="font-size: 14px; font-weight: 800; color: #38bdf8; margin-top: 2px;">+ Docencia</div>
-          </button>
-          <button class="btn-quick" onclick="addIncomePrompt('Ingreso Inesperado / Extra', 500000)">
-            <span style="font-size: 10px; color: #94a3b8;">Bono / Extra</span>
-            <div style="font-size: 14px; font-weight: 800; color: #fbbf24; margin-top: 2px;">✨ Inesperado</div>
+            <div style="font-size: 14px; font-weight: 800; color: #34d399;">+ Q2 Base</div>
           </button>
         </div>
-
-        <button onclick="promptUnreceivedIncome()" style="width: 100%; margin-top: 10px; background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.25); color: #fb7185; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: left;">
-          ⚠️ Registrar "Ingreso Esperado No Recibido" (Alerta de cobro)
-        </button>
       </div>
 
       <div class="glass-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Historial Registrado</span>
-          <button onclick="clearAllIncomes()" style="background: none; border: none; color: #f43f5e; font-size: 10px; font-weight: 700; cursor: pointer;">Limpiar</button>
-        </div>
-        <div id="income-list-view"></div>
+        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Historial</span>
+        <div id="income-list-view" style="margin-top: 8px;"></div>
       </div>
     </div>
 
-    <!-- PESTAÑA 4: MISIONES CON INSIGNIAS DE VICTORIA E HISTÓRICO -->
+    <!-- PESTAÑA 4: MISIONES CON ESTRATEGIAS -->
     <div id="panel-missions" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div>
-          <h2 style="font-size: 16px; font-weight: 800;">Misiones & Objetivos</h2>
-          <p style="font-size: 11px; color: #94a3b8;">Edita metas con valores reales y reclama medallas</p>
-        </div>
+        <h2 style="font-size: 16px; font-weight: 800;">Misiones & Metas</h2>
         <button class="btn-action-main" onclick="openNewMissionModal()">+ Misión</button>
       </div>
 
-      <!-- MISIONES ACTIVAS -->
-      <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">🎯 En Progreso</span>
-      <div id="missions-active-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;"></div>
-
-      <!-- HISTÓRICO DE INSIGNIAS COMPLETADAS -->
-      <div style="margin-top: 20px;">
-        <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">🏆 Muro de Insignias & Metas Cumplidas</span>
-        <div id="missions-completed-container" style="margin-top: 8px;"></div>
-      </div>
+      <div id="missions-active-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
     </div>
 
-    <!-- PESTAÑA 5: ICLOUD & BANCOS -->
+    <!-- PESTAÑA 5: ICLOUD & ATAJOS -->
     <div id="panel-sync" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
-        <h2 style="font-size: 16px; font-weight: 800;">Sincronización iCloud & Bancos</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Procesa compras de Bancolombia/BBVA</p>
+        <h2 style="font-size: 16px; font-weight: 800;">Integración Atajos iOS</h2>
+        <p style="font-size: 11px; color: #94a3b8;">Lee correos de Bancolombia/BBVA en iCloud</p>
       </div>
 
       <div class="glass-card">
-        <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Lector de Alertas Bancarias</span>
-        <textarea id="txt-sms" rows="2" style="width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 10px; color: #fff; font-size: 12px; margin-top: 8px;" placeholder="Pega aquí el texto: Bancolombia le informa compra por $75.000..."></textarea>
-        <button class="btn-action-main" style="width: 100%; padding: 10px; margin-top: 6px;" onclick="processSmsAlert()">⚡ Procesar y Sumar XP</button>
+        <b style="font-size: 12px; color: #38bdf8;">Configuración en la App Atajos (iPhone):</b>
+        <ol style="font-size: 11px; color: #cbd5e1; margin-left: 18px; margin-top: 8px; line-height: 1.5;">
+          <li>Crea una <b>Automatización Personal</b> > <i>"Cuando llegue un correo"</i>.</li>
+          <li>Filtra por remitente: <code>alertasynotificaciones@bancolombia.com.co</code>.</li>
+          <li>Añade la acción: <b>Obtener contenido de URL</b> apuntando al webhook con el monto extraído.</li>
+        </ol>
       </div>
     </div>
   </main>
 
-  <!-- BARRA INFERIOR -->
+  <!-- NAVEGACIÓN -->
   <nav class="bottom-nav">
-    <button class="nav-tab active" id="tab-btn-pet" onclick="changeTab('pet')">
-      <span class="nav-icon">🦊</span>
-      <span>Mascota</span>
-    </button>
-    <button class="nav-tab" id="tab-btn-expenses" onclick="changeTab('expenses')">
-      <span class="nav-icon">🧾</span>
-      <span>Gastos</span>
-    </button>
-    <button class="nav-tab" id="tab-btn-income" onclick="changeTab('income')">
-      <span class="nav-icon">💵</span>
-      <span>Ingresos</span>
-    </button>
-    <button class="nav-tab" id="tab-btn-missions" onclick="changeTab('missions')">
-      <span class="nav-icon">🎯</span>
-      <span>Misiones</span>
-    </button>
-    <button class="nav-tab" id="tab-btn-sync" onclick="changeTab('sync')">
-      <span class="nav-icon">✉️</span>
-      <span>iCloud</span>
-    </button>
+    <button class="nav-tab active" id="tab-btn-pet" onclick="changeTab('pet')"><span class="nav-icon">🦊</span><span>Mascota</span></button>
+    <button class="nav-tab" id="tab-btn-expenses" onclick="changeTab('expenses')"><span class="nav-icon">🧾</span><span>Gastos</span></button>
+    <button class="nav-tab" id="tab-btn-income" onclick="changeTab('income')"><span class="nav-icon">💵</span><span>Ingresos</span></button>
+    <button class="nav-tab" id="tab-btn-missions" onclick="changeTab('missions')"><span class="nav-icon">🎯</span><span>Misiones</span></button>
+    <button class="nav-tab" id="tab-btn-sync" onclick="changeTab('sync')"><span class="nav-icon">✉️</span><span>iCloud</span></button>
   </nav>
 
-  <!-- MODAL: CREAR / EDITAR GASTO -->
+  <!-- MODAL GASTO -->
   <div id="modal-expense-sheet" class="modal-backdrop">
     <div class="modal-sheet">
-      <b style="font-size: 14px;" id="m-exp-modal-title">Añadir / Editar Gasto</b>
+      <b style="font-size: 14px;" id="m-exp-modal-title">Gasto</b>
       <input type="hidden" id="m-exp-id">
       <div style="margin-top: 10px;">
-        <label style="font-size: 11px; color: #94a3b8;">Tipo de Gasto</label>
+        <label style="font-size: 11px; color: #94a3b8;">Tipo</label>
         <select id="m-exp-type">
-          <option value="recurrent">📅 Gasto Recurrente (Fijo / Obligatorio)</option>
-          <option value="daily">☕ Gasto Diario / Hormiga</option>
+          <option value="recurrent">📅 Recurrente (Fijo)</option>
+          <option value="daily">☕ Diario (Hormiga)</option>
         </select>
-
         <label style="font-size: 11px; color: #94a3b8;">Concepto</label>
-        <input type="text" id="m-exp-title-input" placeholder="Ej. Cuota Moto / Tinto / Gasolina">
-
+        <input type="text" id="m-exp-title-input" placeholder="Nombre">
         <label style="font-size: 11px; color: #94a3b8;">Monto ($ COP)</label>
-        <input type="number" id="m-exp-amount-input" placeholder="Ej. 800000">
-
-        <label style="font-size: 11px; color: #94a3b8;">Vencimiento / Periodo</label>
-        <input type="text" id="m-exp-due-input" placeholder="Ej. Mitad de mes (Q2) / Hoy">
-
-        <label style="font-size: 11px; color: #94a3b8;">Atributo Relacionado</label>
-        <select id="m-exp-skill-input">
-          <option value="STR">💪 Fuerza (Gym, Salud, Comida)</option>
-          <option value="INT">🧠 Intelecto (Estudio, Software, Libros)</option>
-          <option value="DEX">🎯 Destreza (Moto, Música DJ, Equipos)</option>
-          <option value="SPI">✨ Espíritu (Perro, Hogar, Bienestar)</option>
-        </select>
+        <input type="number" id="m-exp-amount-input" placeholder="800000">
+        <label style="font-size: 11px; color: #94a3b8;">Periodo</label>
+        <input type="text" id="m-exp-due-input" placeholder="Mitad de mes (Q2)">
       </div>
       <div style="display: flex; gap: 8px;">
-        <button onclick="closeExpenseModal()" style="flex: 1; background: #1e293b; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer;">Cancelar</button>
+        <button onclick="closeExpenseModal()" style="flex: 1; background: #1e293b; color: white; border: none; padding: 10px; border-radius: 10px;">Cancelar</button>
         <button onclick="saveExpenseData()" class="btn-action-main" style="flex: 1; padding: 10px;">Guardar</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: CREAR / EDITAR MISIÓN -->
+  <!-- MODAL MISIÓN -->
   <div id="modal-mission-sheet" class="modal-backdrop">
     <div class="modal-sheet">
-      <b style="font-size: 14px;" id="m-mission-modal-title">Editar Misión</b>
+      <b style="font-size: 14px;">Misión</b>
       <input type="hidden" id="m-mission-id">
       <div style="margin-top: 10px;">
-        <label style="font-size: 11px; color: #94a3b8;">Nombre de la Misión</label>
-        <input type="text" id="m-mission-title" placeholder="Ej. Festival Ritvales / Paracaidismo">
-
-        <label style="font-size: 11px; color: #94a3b8;">Meta Total ($ COP)</label>
-        <input type="number" id="m-mission-target" placeholder="Ej. 1500000">
-
-        <label style="font-size: 11px; color: #94a3b8;">Ahorrado Real ($ COP)</label>
-        <input type="number" id="m-mission-current" placeholder="Ej. 500000">
+        <label style="font-size: 11px; color: #94a3b8;">Título</label>
+        <input type="text" id="m-mission-title">
+        <label style="font-size: 11px; color: #94a3b8;">Meta ($ COP)</label>
+        <input type="number" id="m-mission-target">
+        <label style="font-size: 11px; color: #94a3b8;">Ahorro Real ($ COP)</label>
+        <input type="number" id="m-mission-current">
       </div>
       <div style="display: flex; gap: 8px;">
-        <button onclick="closeMissionModal()" style="flex: 1; background: #1e293b; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer;">Cancelar</button>
+        <button onclick="closeMissionModal()" style="flex: 1; background: #1e293b; color: white; border: none; padding: 10px; border-radius: 10px;">Cancelar</button>
         <button onclick="saveMissionData()" class="btn-action-main" style="flex: 1; padding: 10px;">Guardar</button>
       </div>
     </div>
   </div>
 
   <script>
-    const app = {
-      xp: 0, hp: 100, level: 1,
-      currentSubtab: 'recurrent',
-      avatarEmoji: localStorage.getItem('fq_avatar_emoji') || '🥟',
-      avatarName: localStorage.getItem('fq_avatar_name') || 'Empanada Nea',
-      skills: { STR: 10, INT: 5, DEX: 15, SPI: 10 },
-      expenses: JSON.parse(localStorage.getItem('fq_v13_expenses') || JSON.stringify([
-        { id: '1', type: 'recurrent', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', skill: 'DEX', sName: 'Destreza', paid: false },
-        { id: '2', type: 'recurrent', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 del mes', skill: 'SPI', sName: 'Espíritu', paid: true },
-        { id: '3', type: 'recurrent', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', skill: 'DEX', sName: 'Destreza', paid: false },
-        { id: '4', type: 'recurrent', title: 'Gimnasio', amount: 250000, due: 'Día 1 del mes', skill: 'STR', sName: 'Fuerza', paid: true },
-        { id: '5', type: 'recurrent', title: 'Cuidado Perro', amount: 400000, due: 'Recurrente', skill: 'SPI', sName: 'Espíritu', paid: true },
-        { id: '6', type: 'daily', title: 'Almuerzo / Café Diario', amount: 28000, due: 'Hoy', skill: 'STR', sName: 'Fuerza', paid: true },
-        { id: '7', type: 'daily', title: 'Gasolina Moto', amount: 35000, due: 'Semanal', skill: 'DEX', sName: 'Destreza', paid: false }
-      ])),
-      incomes: JSON.parse(localStorage.getItem('fq_v13_incomes') || '[]'),
-      missions: JSON.parse(localStorage.getItem('fq_v13_missions') || JSON.stringify([
-        { id: 'dian', title: 'Compromiso DIAN', target: 1000000, current: 1000000, completed: true, badge: '🛡️ Escudo Tributario' },
-        { id: 'ritvales', title: 'Festival Ritvales', target: 1450000, current: 950000, completed: false, badge: '🪩 Raver Pass' },
-        { id: 'paracaidas', title: 'Paracaidismo', target: 1500000, current: 225000, completed: false, badge: '🪂 Alas de Acero' },
-        { id: 'viaje', title: 'Viaje Fin de Año', target: 2500000, current: 750000, completed: false, badge: '✈️ Pasaporte Libre' }
-      ]))
-    };
+    // SISTEMA MULTIUSUARIO AISLADO (No se pierde con cambios de código)
+    let currentUser = localStorage.getItem('fq_active_user');
 
-    function setAvatar(emoji, name, cardId) {
-      app.avatarEmoji = emoji;
-      app.avatarName = name;
-      localStorage.setItem('fq_avatar_emoji', emoji);
-      localStorage.setItem('fq_avatar_name', name);
-      
-      document.querySelectorAll('.char-card').forEach(c => c.classList.remove('active'));
-      document.getElementById(cardId).classList.add('active');
-      
-      document.getElementById('top-avatar').innerHTML = `${emoji} <span id="badge-level" class="lvl-badge">Nv.${app.level}</span>`;
-      document.getElementById('top-char-name').innerText = name;
-      document.getElementById('sprite-pet').innerText = emoji;
-      document.getElementById('pet-title-name').innerText = name;
-      showToast(`¡Compañero cambiado a ${name}!`);
+    function getUsersDB() {
+      return JSON.parse(localStorage.getItem('fq_users_db') || '{}');
     }
 
-    function switchExpenseSubtab(tab) {
-      app.currentSubtab = tab;
-      document.getElementById('btn-subtab-recurrent').classList.toggle('active', tab === 'recurrent');
-      document.getElementById('btn-subtab-daily').classList.toggle('active', tab === 'daily');
+    function saveUserDB(db) {
+      localStorage.setItem('fq_users_db', JSON.stringify(db));
+    }
+
+    function handleRegister() {
+      const u = document.getElementById('auth-user').value.trim();
+      const p = document.getElementById('auth-pass').value.trim();
+      if (!u || !p) return alert('Ingresa usuario y contraseña');
+      
+      const db = getUsersDB();
+      if (db[u]) return alert('Este usuario ya existe.');
+
+      db[u] = {
+        pass: p,
+        data: {
+          xp: 0, hp: 100, level: 1, avatar: '🥟', avatarName: 'Empanada Nea',
+          expenses: [
+            { id: '1', type: 'recurrent', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', paid: false },
+            { id: '2', type: 'recurrent', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 del mes', paid: true },
+            { id: '3', type: 'recurrent', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', paid: false }
+          ],
+          incomes: [],
+          missions: [
+            { id: 'ritvales', title: 'Festival Ritvales', target: 1450000, current: 950000, completed: false },
+            { id: 'paracaidas', title: 'Paracaidismo', target: 1500000, current: 225000, completed: false }
+          ]
+        }
+      };
+
+      saveUserDB(db);
+      loginUser(u);
+    }
+
+    function handleLogin() {
+      const u = document.getElementById('auth-user').value.trim();
+      const p = document.getElementById('auth-pass').value.trim();
+      const db = getUsersDB();
+
+      if (db[u] && db[u].pass === p) {
+        loginUser(u);
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    }
+
+    function loginUser(u) {
+      currentUser = u;
+      localStorage.setItem('fq_active_user', u);
+      document.getElementById('auth-overlay').style.display = 'none';
+      loadUserData();
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('fq_active_user');
+      location.reload();
+    }
+
+    // CARGA DE DATOS DEL USUARIO ACTIVO
+    let appData = {};
+
+    function loadUserData() {
+      const db = getUsersDB();
+      if (!db[currentUser]) return logoutUser();
+      appData = db[currentUser].data;
+
+      document.getElementById('top-char-name').innerText = appData.avatarName;
+      document.getElementById('top-avatar').innerHTML = `${appData.avatar} <span class="lvl-badge">Nv.${appData.level}</span>`;
+      document.getElementById('sprite-pet').innerText = appData.avatar;
+
+      renderExpenses();
+      renderIncomes();
+      renderMissions();
+      runIACoach();
+    }
+
+    function persistUserData() {
+      const db = getUsersDB();
+      if (db[currentUser]) {
+        db[currentUser].data = appData;
+        saveUserDB(db);
+      }
+    }
+
+    // GASTOS & SUBTABS
+    let currentSubtab = 'recurrent';
+
+    function switchExpenseSubtab(t) {
+      currentSubtab = t;
+      document.getElementById('btn-subtab-recurrent').classList.toggle('active', t === 'recurrent');
+      document.getElementById('btn-subtab-daily').classList.toggle('active', t === 'daily');
       renderExpenses();
     }
 
@@ -436,45 +378,28 @@
       pBox.innerHTML = '';
       dBox.innerHTML = '';
 
-      const list = app.expenses.filter(e => e.type === app.currentSubtab);
-      const pending = list.filter(e => !e.paid);
-      const paid = list.filter(e => e.paid);
-
-      if (pending.length === 0) {
-        pBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">¡Excelente! No tienes gastos pendientes en esta categoría.</p>';
-      } else {
-        pending.forEach(e => pBox.appendChild(createExpenseCard(e)));
-      }
-
-      if (paid.length === 0) {
-        dBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">No hay pagos aprobados aún.</p>';
-      } else {
-        paid.forEach(e => dBox.appendChild(createExpenseCard(e)));
-      }
-
-      runIACoachAnalysis();
+      const list = appData.expenses.filter(e => e.type === currentSubtab);
+      list.filter(e => !e.paid).forEach(e => pBox.appendChild(createExpenseRow(e)));
+      list.filter(e => e.paid).forEach(e => dBox.appendChild(createExpenseRow(e)));
+      runIACoach();
     }
 
-    function createExpenseCard(e) {
+    function createExpenseRow(e) {
       const d = document.createElement('div');
       d.className = 'glass-card';
       d.style.marginBottom = '0px';
       d.style.display = 'flex';
       d.style.justifyContent = 'space-between';
       d.style.alignItems = 'center';
-      d.style.opacity = e.paid ? '0.65' : '1';
+      d.style.opacity = e.paid ? '0.6' : '1';
       d.innerHTML = `
         <div>
-          <div style="display: flex; gap: 6px; align-items: center;">
-            <b style="font-size: 13px; text-decoration: ${e.paid ? 'line-through' : 'none'};">${e.title}</b>
-            <span class="tag ${e.paid ? 'tag-paid' : 'tag-pending'}">${e.paid ? 'PAGADO' : 'PENDIENTE'}</span>
-          </div>
-          <div style="font-size: 10px; color: #94a3b8; margin-top: 3px;">⏱️ ${e.due} &bull; +${e.sName}</div>
+          <b style="font-size: 13px; text-decoration: ${e.paid ? 'line-through' : 'none'};">${e.title}</b>
+          <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;">⏱️ ${e.due}</div>
         </div>
         <div style="text-align: right;">
           <b style="font-size: 13px;">$${e.amount.toLocaleString('es-CO')}</b>
           <div style="display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px;">
-            <button onclick="editExpense('${e.id}')" class="btn-action-sm">✏️</button>
             <button onclick="deleteExpense('${e.id}')" class="btn-action-sm" style="color: #f43f5e;">🗑️</button>
             <button onclick="toggleExpense('${e.id}')" class="btn-action-sm" style="background: ${e.paid ? '#1e293b' : '#6366f1'}; color: white;">
               ${e.paid ? 'Desmarcar' : 'Aprobar'}
@@ -486,366 +411,154 @@
     }
 
     function toggleExpense(id) {
-      const it = app.expenses.find(x => x.id === id);
+      const it = appData.expenses.find(x => x.id === id);
       if (it) {
         it.paid = !it.paid;
-        if (it.paid) {
-          app.skills[it.skill] += 5;
-          gainXP(25, `¡Pago aprobado! +25 XP y +5 en ${it.sName}`);
-          updateSkills();
-        }
-        localStorage.setItem('fq_v13_expenses', JSON.stringify(app.expenses));
+        persistUserData();
         renderExpenses();
       }
     }
 
-    function editExpense(id) {
-      const e = app.expenses.find(x => x.id === id);
-      if (e) {
-        document.getElementById('m-exp-modal-title').innerText = 'Editar Gasto';
-        document.getElementById('m-exp-id').value = e.id;
-        document.getElementById('m-exp-type').value = e.type;
-        document.getElementById('m-exp-title-input').value = e.title;
-        document.getElementById('m-exp-amount-input').value = e.amount;
-        document.getElementById('m-exp-due-input').value = e.due;
-        document.getElementById('m-exp-skill-input').value = e.skill;
-        document.getElementById('modal-expense-sheet').style.display = 'flex';
-      }
+    function deleteExpense(id) {
+      appData.expenses = appData.expenses.filter(x => x.id !== id);
+      persistUserData();
+      renderExpenses();
     }
 
-    function openNewExpenseModal() {
-      document.getElementById('m-exp-modal-title').innerText = 'Añadir Gasto';
+    function openExpenseModal() {
       document.getElementById('m-exp-id').value = '';
       document.getElementById('m-exp-title-input').value = '';
       document.getElementById('m-exp-amount-input').value = '';
-      document.getElementById('m-exp-due-input').value = 'Mitad de mes (Q2)';
       document.getElementById('modal-expense-sheet').style.display = 'flex';
     }
 
     function closeExpenseModal() { document.getElementById('modal-expense-sheet').style.display = 'none'; }
 
     function saveExpenseData() {
-      const id = document.getElementById('m-exp-id').value;
-      const type = document.getElementById('m-exp-type').value;
       const title = document.getElementById('m-exp-title-input').value;
       const amount = parseInt(document.getElementById('m-exp-amount-input').value);
+      const type = document.getElementById('m-exp-type').value;
       const due = document.getElementById('m-exp-due-input').value || 'Por definir';
-      const skill = document.getElementById('m-exp-skill-input').value;
-      const mapNames = { STR: 'Fuerza', INT: 'Intelecto', DEX: 'Destreza', SPI: 'Espíritu' };
 
       if (title && !isNaN(amount)) {
-        if (id) {
-          const e = app.expenses.find(x => x.id === id);
-          if (e) { Object.assign(e, { type, title, amount, due, skill, sName: mapNames[skill] }); }
-        } else {
-          app.expenses.unshift({ id: Date.now().toString(), type, title, amount, due, skill, sName: mapNames[skill], paid: false });
-        }
-        localStorage.setItem('fq_v13_expenses', JSON.stringify(app.expenses));
+        appData.expenses.unshift({ id: Date.now().toString(), type, title, amount, due, paid: false });
+        persistUserData();
         closeExpenseModal();
         renderExpenses();
-        showToast('Gasto guardado con éxito');
-      } else alert('Ingresa concepto y valor válidos');
-    }
-
-    function deleteExpense(id) {
-      if (confirm('¿Eliminar este gasto?')) {
-        app.expenses = app.expenses.filter(x => x.id !== id);
-        localStorage.setItem('fq_v13_expenses', JSON.stringify(app.expenses));
-        renderExpenses();
-        showToast('Gasto eliminado');
       }
     }
 
-    function applyDirectPunishment() {
-      const motivo = prompt('¿En qué desperdiciaste tiempo o dinero? (ej: Compras impulsivas, Procrastinar la tarde):', 'Gasto impulsivo');
-      if (motivo) {
-        app.hp = Math.max(0, app.hp - 20);
-        document.getElementById('val-hp').innerText = `${app.hp}% HP`;
-        if (app.hp < 40) {
-          document.getElementById('val-hp').style.color = '#f43f5e';
-          document.getElementById('pet-status-tag').innerText = 'Estado: Herido y Agotado 🩹';
-          document.getElementById('pet-status-tag').style.color = '#f43f5e';
-        }
-        showToast(`🚨 Sanción aplicada por "${motivo}": -20% HP`);
-        runIACoachAnalysis();
-      }
-    }
-
-    /* MOTOR DE ANÁLISIS IA FINANCIERO */
-    function runIACoachAnalysis() {
-      const totalIncome = app.incomes.filter(i => !i.alert).reduce((sum, i) => sum + i.amount, 0);
-      const pendingExpenses = app.expenses.filter(e => !e.paid).reduce((sum, e) => sum + e.amount, 0);
-      const activeMissionsPending = app.missions.filter(m => !m.completed).reduce((sum, m) => sum + Math.max(0, m.target - m.current), 0);
-      const netProjected = totalIncome - pendingExpenses;
-
-      document.getElementById('kpi-incomes').innerText = `$${(totalIncome/1000000).toFixed(1)}M`;
-      document.getElementById('kpi-expenses').innerText = `$${(pendingExpenses/1000000).toFixed(1)}M`;
-      document.getElementById('kpi-balance').innerText = `$${(netProjected/1000000).toFixed(1)}M`;
-
-      const badge = document.getElementById('ia-alert-badge');
-      const text = document.getElementById('ia-advice-text');
-
-      if (totalIncome === 0) {
-        badge.className = 'tag tag-pending';
-        badge.innerText = 'Esperando Q1';
-        text.innerText = '💡 Registra el cobro de tu primera quincena en la pestaña Ingresos para calibrar el flujo.';
-      } else if (netProjected < 0) {
-        badge.className = 'tag tag-alert';
-        badge.innerText = 'Déficit en Radar';
-        text.innerText = `⚠️ Tus gastos pendientes superan tus ingresos registrados por $${Math.abs(netProjected).toLocaleString('es-CO')}. Cuida la cuota de la moto y reduce salidas hormiga.`;
-      } else if (netProjected < 500000) {
-        badge.className = 'tag tag-pending';
-        badge.innerText = 'Margen Ajustado';
-        text.innerText = `🟡 Tienes un margen neto de $${netProjected.toLocaleString('es-CO')}. Te sugiero congelar compras no esenciales hasta asegurar el fondo de Ritvales o Paracaidismo.`;
-      } else {
-        badge.className = 'tag tag-paid';
-        badge.innerText = 'Flujo Óptimo';
-        text.innerText = `🚀 Cobertura sólida. Tu excedente proyectado es de $${netProjected.toLocaleString('es-CO')}. Puedes acelerar un abono a tus misiones de Octubre.`;
-      }
-    }
-
-    /* MISIONES: EDICIÓN, COMPLETADO E HISTÓRICO CON INSIGNIAS */
+    // MISIONES CON RECOMENDACIONES IA
     function renderMissions() {
-      const actBox = document.getElementById('missions-active-container');
-      const compBox = document.getElementById('missions-completed-container');
-      actBox.innerHTML = '';
-      compBox.innerHTML = '';
+      const box = document.getElementById('missions-active-container');
+      box.innerHTML = '';
 
-      const active = app.missions.filter(m => !m.completed);
-      const completed = app.missions.filter(m => m.completed);
+      appData.missions.forEach(m => {
+        const faltante = Math.max(0, m.target - m.current);
+        const cuotaQuincenal = Math.round(faltante / 2);
+        const recorteDiario = Math.round(faltante / 30);
 
-      if (active.length === 0) {
-        actBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">No hay misiones activas. ¡Crea una nueva meta!</p>';
-      } else {
-        active.forEach(m => {
-          const pct = Math.min(100, Math.round((m.current / m.target) * 100));
-          const div = document.createElement('div');
-          div.className = 'glass-card';
-          div.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <b style="font-size: 13px;">${m.title}</b>
-                <p style="font-size: 11px; color: #94a3b8; margin-top: 2px;">$${m.current.toLocaleString('es-CO')} de $${m.target.toLocaleString('es-CO')} (${pct}%)</p>
-              </div>
-              <div style="display: flex; gap: 4px;">
-                <button onclick="openEditMission('${m.id}')" class="btn-action-sm">✏️</button>
-                <button onclick="addFundToMission('${m.id}')" class="btn-action-main" style="padding: 4px 8px; font-size: 10px;">+ Abonar</button>
-                <button onclick="claimMissionReward('${m.id}')" class="btn-action-sm" style="color: #fbbf24; border-color: #fbbf24;">🏆 Reclamar</button>
-              </div>
-            </div>
-            <div class="bar-track" style="margin-top: 8px;">
-              <div style="width: ${pct}%; height: 100%; background: #6366f1; border-radius: 99px;"></div>
-            </div>
-          `;
-          actBox.appendChild(div);
-        });
-      }
-
-      if (completed.length === 0) {
-        compBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 4px 0;">Cumple una misión para exhibir aquí tu primera insignia.</p>';
-      } else {
-        completed.forEach(m => {
-          const mdiv = document.createElement('div');
-          mdiv.className = 'medal-box';
-          mdiv.innerHTML = `
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <span style="font-size: 26px;">🎖️</span>
-              <div>
-                <b style="font-size: 13px; color: #fbbf24;">${m.badge || '🏆 Conquistador'}</b>
-                <p style="font-size: 11px; color: #cbd5e1; margin-top: 1px;">${m.title} &bull; $${m.target.toLocaleString('es-CO')}</p>
-              </div>
-            </div>
-            <div style="display: flex; gap: 4px;">
-              <span class="tag tag-paid">Cumplida</span>
-              <button onclick="deleteMission('${m.id}')" class="btn-action-sm" style="color: #f43f5e;">🗑️</button>
-            </div>
-          `;
-          compBox.appendChild(mdiv);
-        });
-      }
-
-      runIACoachAnalysis();
+        const d = document.createElement('div');
+        d.className = 'glass-card';
+        d.innerHTML = `
+          <div style="display: flex; justify-content: space-between;">
+            <b>${m.title}</b>
+            <b style="color: #38bdf8;">$${m.current.toLocaleString('es-CO')} / $${m.target.toLocaleString('es-CO')}</b>
+          </div>
+          <div class="bar-track">
+            <div style="width: ${Math.min(100, Math.round((m.current/m.target)*100))}%; height: 100%; background: #6366f1;"></div>
+          </div>
+          <div class="rec-box">
+            💡 <b>Estrategia de Cumplimiento:</b> Faltan $${faltante.toLocaleString('es-CO')}.<br>
+            • <b>Por Ingreso:</b> Aparta <b>$${cuotaQuincenal.toLocaleString('es-CO')}</b> de tus próximas 2 quincenas.<br>
+            • <b>Por Gasto:</b> O recorta <b>$${recorteDiario.toLocaleString('es-CO')}/día</b> en gastos hormiga diarios durante 30 días.
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px;">
+            <button onclick="abonarMision('${m.id}')" class="btn-action-main">+ Abonar</button>
+          </div>
+        `;
+        box.appendChild(d);
+      });
     }
 
-    function claimMissionReward(id) {
-      const m = app.missions.find(x => x.id === id);
+    function abonarMision(id) {
+      const m = appData.missions.find(x => x.id === id);
       if (m) {
-        if (m.current < m.target) {
-          if (!confirm(`Aún te faltan $${(m.target - m.current).toLocaleString('es-CO')}. ¿Deseas marcarla como cumplida y reclamar la insignia?`)) return;
-        }
-        m.completed = true;
-        m.current = m.target;
-        gainXP(100, `🏆 ¡MISIÓN CUMPLIDA! Desbloqueaste la insignia "${m.badge || 'Victoria'}" (+100 XP)`);
-        localStorage.setItem('fq_v13_missions', JSON.stringify(app.missions));
-        renderMissions();
-      }
-    }
-
-    function deleteMission(id) {
-      if (confirm('¿Eliminar esta misión del registro?')) {
-        app.missions = app.missions.filter(x => x.id !== id);
-        localStorage.setItem('fq_v13_missions', JSON.stringify(app.missions));
-        renderMissions();
-        showToast('Misión eliminada');
-      }
-    }
-
-    function openEditMission(id) {
-      const m = app.missions.find(x => x.id === id);
-      if (m) {
-        document.getElementById('m-mission-modal-title').innerText = 'Editar Misión';
-        document.getElementById('m-mission-id').value = m.id;
-        document.getElementById('m-mission-title').value = m.title;
-        document.getElementById('m-mission-target').value = m.target;
-        document.getElementById('m-mission-current').value = m.current;
-        document.getElementById('modal-mission-sheet').style.display = 'flex';
-      }
-    }
-
-    function openNewMissionModal() {
-      document.getElementById('m-mission-modal-title').innerText = 'Nueva Misión';
-      document.getElementById('m-mission-id').value = '';
-      document.getElementById('m-mission-title').value = '';
-      document.getElementById('m-mission-target').value = '';
-      document.getElementById('m-mission-current').value = '0';
-      document.getElementById('modal-mission-sheet').style.display = 'flex';
-    }
-
-    function closeMissionModal() { document.getElementById('modal-mission-sheet').style.display = 'none'; }
-
-    function saveMissionData() {
-      const id = document.getElementById('m-mission-id').value;
-      const title = document.getElementById('m-mission-title').value;
-      const target = parseInt(document.getElementById('m-mission-target').value);
-      const current = parseInt(document.getElementById('m-mission-current').value) || 0;
-
-      if (title && !isNaN(target)) {
-        if (id) {
-          const m = app.missions.find(x => x.id === id);
-          if (m) { m.title = title; m.target = target; m.current = current; }
-        } else {
-          app.missions.push({ id: Date.now().toString(), title, target, current, completed: false, badge: '⭐ Experiencia Pro' });
-        }
-        localStorage.setItem('fq_v13_missions', JSON.stringify(app.missions));
-        renderMissions();
-        closeMissionModal();
-        showToast('Misión guardada');
-      } else alert('Ingresa título y meta válidos');
-    }
-
-    function addFundToMission(id) {
-      const m = app.missions.find(x => x.id === id);
-      if (m) {
-        const val = prompt(`Monto a abonar a "${m.title}" ($ COP):`, '150000');
-        if (val && !isNaN(val)) {
-          m.current += parseInt(val);
-          localStorage.setItem('fq_v13_missions', JSON.stringify(app.missions));
-          gainXP(30, `Abonados $${parseInt(val).toLocaleString('es-CO')} a ${m.title} (+30 XP)`);
+        const v = prompt(`Monto a abonar a ${m.title}:`, '150000');
+        if (v && !isNaN(v)) {
+          m.current += parseInt(v);
+          persistUserData();
           renderMissions();
         }
       }
     }
 
-    /* INGRESOS */
+    function openNewMissionModal() {
+      document.getElementById('modal-mission-sheet').style.display = 'flex';
+    }
+    function closeMissionModal() { document.getElementById('modal-mission-sheet').style.display = 'none'; }
+    function saveMissionData() {
+      const t = document.getElementById('m-mission-title').value;
+      const tg = parseInt(document.getElementById('m-mission-target').value);
+      const c = parseInt(document.getElementById('m-mission-current').value) || 0;
+      if (t && !isNaN(tg)) {
+        appData.missions.push({ id: Date.now().toString(), title: t, target: tg, current: c, completed: false });
+        persistUserData();
+        closeMissionModal();
+        renderMissions();
+      }
+    }
+
+    // INGRESOS
     function renderIncomes() {
       const box = document.getElementById('income-list-view');
       box.innerHTML = '';
-      if (app.incomes.length === 0) {
-        box.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 4px 0;">No hay ingresos registrados aún.</p>';
-        return;
-      }
-      app.incomes.forEach((inc, idx) => {
+      appData.incomes.forEach((inc, idx) => {
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.justifyContent = 'space-between';
-        row.style.alignItems = 'center';
         row.style.padding = '8px 0';
         row.style.borderBottom = '1px solid #1e293b';
         row.style.fontSize = '12px';
         row.innerHTML = `
-          <div>
-            <b>${inc.title}</b>
-            <span class="tag ${inc.alert ? 'tag-alert' : 'tag-paid'}" style="margin-left: 4px;">${inc.alert ? 'POR COBRAR' : 'RECIBIDO'}</span>
-            <div style="font-size: 10px; color: #94a3b8;">${inc.date}</div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <b style="color: ${inc.alert ? '#fb7185' : '#34d399'};">+$${inc.amount.toLocaleString('es-CO')}</b>
-            <button onclick="deleteIncome(${idx})" style="background:none; border:none; color:#f43f5e; cursor:pointer;">🗑️</button>
-          </div>
+          <span><b>${inc.title}</b> (${inc.date})</span>
+          <b style="color: #34d399;">+$${inc.amount.toLocaleString('es-CO')}</b>
         `;
         box.appendChild(row);
       });
-      runIACoachAnalysis();
     }
 
-    function addIncomePrompt(title, defAmt) {
-      const val = prompt(`Monto a ingresar para ${title} ($ COP):`, defAmt);
-      if (val && !isNaN(val)) {
-        app.incomes.unshift({ title, amount: parseInt(val), date: 'Registrado', alert: false });
-        localStorage.setItem('fq_v13_incomes', JSON.stringify(app.incomes));
-        gainXP(25, `+$${parseInt(val).toLocaleString('es-CO')} ingresados (+25 XP)`);
+    function addIncomePrompt(title, def) {
+      const v = prompt(`Monto para ${title}:`, def);
+      if (v && !isNaN(v)) {
+        appData.incomes.unshift({ title, amount: parseInt(v), date: 'Hoy' });
+        persistUserData();
         renderIncomes();
+        runIACoach();
       }
     }
 
-    function promptUnreceivedIncome() {
-      const title = prompt('¿Qué ingreso esperado no ha llegado?:', 'Honorario pendiente');
-      if (title) {
-        const val = prompt('¿Monto adeudado ($ COP)?:', '1200000');
-        if (val && !isNaN(val)) {
-          app.incomes.unshift({ title, amount: parseInt(val), date: '⚠️ PENDIENTE', alert: true });
-          localStorage.setItem('fq_v13_incomes', JSON.stringify(app.incomes));
-          showToast('Alerta de cobro agregada');
-          renderIncomes();
-        }
+    // COACH IA
+    function runIACoach() {
+      const incTotal = appData.incomes.reduce((s, i) => s + i.amount, 0);
+      const expPending = appData.expenses.filter(e => !e.paid).reduce((s, e) => s + e.amount, 0);
+      const neto = incTotal - expPending;
+      const text = document.getElementById('ia-advice-text');
+
+      if (incTotal === 0) {
+        text.innerText = '💡 Registra tu primera quincena en la pestaña Ingresos para calibrar el flujo.';
+      } else if (neto < 0) {
+        text.innerText = `⚠️ Tienes un desfase proyectado de $${Math.abs(neto).toLocaleString('es-CO')}. Congela gastos diarios de inmediato.`;
+      } else {
+        text.innerText = `🚀 Cobertura sólida. Tu excedente proyectado es de $${neto.toLocaleString('es-CO')}. Puedes abonar a tus misiones.`;
       }
     }
 
-    function deleteIncome(idx) {
-      app.incomes.splice(idx, 1);
-      localStorage.setItem('fq_v13_incomes', JSON.stringify(app.incomes));
-      renderIncomes();
-      showToast('Registro eliminado');
-    }
-
-    function clearAllIncomes() {
-      if (confirm('¿Vaciar todo el historial de ingresos?')) {
-        app.incomes = [];
-        localStorage.setItem('fq_v13_incomes', JSON.stringify([]));
-        renderIncomes();
-        showToast('Historial limpiado');
-      }
-    }
-
-    function processSmsAlert() {
-      const txt = document.getElementById('txt-sms').value;
-      const m = txt.match(/\$?\s?([0-9.,]+)/);
-      if (m) {
-        const val = parseInt(m[1].replace(/\./g, '').replace(/,/g, ''));
-        gainXP(20, `Gasto detectado: $${val.toLocaleString('es-CO')} (+20 XP)`);
-        document.getElementById('txt-sms').value = '';
-      } else alert('No se detectó un monto en el texto.');
-    }
-
-    function updateSkills() {
-      document.getElementById('chip-str').innerText = `Nv. ${Math.floor(app.skills.STR/10)} (${app.skills.STR} pts)`;
-      document.getElementById('chip-int').innerText = `Nv. ${Math.floor(app.skills.INT/10)} (${app.skills.INT} pts)`;
-      document.getElementById('chip-dex').innerText = `Nv. ${Math.floor(app.skills.DEX/10)} (${app.skills.DEX} pts)`;
-      document.getElementById('chip-spi').innerText = `Nv. ${Math.floor(app.skills.SPI/10)} (${app.skills.SPI} pts)`;
-    }
-
-    function gainXP(amount, msg) {
-      app.xp += amount;
-      if (app.xp >= 100) {
-        app.level += 1;
-        app.xp -= 100;
-        document.getElementById('badge-level').innerText = `Nv.${app.level}`;
-        showToast(`🎉 ¡SUBISTE AL NIVEL ${app.level}!`);
-      }
-      document.getElementById('bar-xp-fill').style.width = `${app.xp}%`;
-      document.getElementById('txt-xp-ratio').innerText = `${app.xp} / 100`;
-      document.getElementById('val-xp').innerText = `${app.xp} XP`;
-      showToast(msg);
+    function setAvatar(emoji, name) {
+      appData.avatar = emoji;
+      appData.avatarName = name;
+      persistUserData();
+      loadUserData();
     }
 
     function changeTab(t) {
@@ -855,27 +568,11 @@
       document.getElementById(`tab-btn-${t}`).classList.add('active');
     }
 
-    function resetDataPrompt() {
-      if (confirm('¿Quieres reiniciar todas las estadísticas a su estado inicial?')) {
-        localStorage.clear();
-        location.reload();
-      }
+    // Iniciar
+    if (currentUser) {
+      document.getElementById('auth-overlay').style.display = 'none';
+      loadUserData();
     }
-
-    function showToast(msg) {
-      const t = document.createElement('div');
-      t.className = 'app-toast';
-      t.innerText = msg;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2200);
-    }
-
-    // Inicialización
-    setAvatar(app.avatarEmoji, app.avatarName, app.avatarEmoji === '🥟' ? 'card-empanada' : (app.avatarEmoji === '☕' ? 'card-cafe' : (app.avatarEmoji === '🍦' ? 'card-cono' : 'card-zorro')));
-    renderExpenses();
-    renderIncomes();
-    renderMissions();
-    updateSkills();
   </script>
 </body>
 </html>
