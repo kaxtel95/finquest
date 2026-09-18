@@ -3,33 +3,582 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinQuest RPG Vault</title>
+  <title>FinQuest RPG</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card: #131b2e;
-      --border: #1f2c47;
-      --accent: #6366f1;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg: #07090e;
+      --surface: #101524;
+      --surface-card: #151c30;
+      --border: #1e2942;
+      --primary: #6366f1;
+      --accent: #38bdf8;
       --emerald: #10b981;
       --amber: #f59e0b;
       --rose: #f43f5e;
+      --text: #f8fafc;
+      --muted: #8e9bb5;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 95px; }
-    .header { position: sticky; top: 0; z-index: 10; background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
-    .avatar-badge { position: relative; width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, #f59e0b, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .lvl-tag { position: absolute; bottom: -4px; right: -4px; background: #fbbf24; color: #000; font-size: 9px; font-weight: 900; padding: 1px 5px; border-radius: 10px; }
-    .container { max-width: 480px; margin: 0 auto; padding: 16px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
-    .pet-hero { text-align: center; background: radial-gradient(circle at top, #1e1b4b, var(--card)); border: 1px solid rgba(99, 102, 241, 0.3); }
-    .pet-bounce { animation: bounce 2s infinite ease-in-out; font-size: 64px; margin: 12px 0; }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    .progress-bar { background: #1e293b; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 10px; }
-    .progress-fill { background: linear-gradient(90deg, #6366f1, #fbbf24); height: 100%; border-radius: 99px; transition: width 0.4s; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
+    
+    /* Header */
+    .app-header { position: sticky; top: 0; z-index: 50; background: rgba(16, 21, 36, 0.9); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .profile-pill { display: flex; align-items: center; gap: 12px; }
+    .avatar-box { position: relative; width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, #4f46e5, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
+    .badge-lvl { position: absolute; bottom: -4px; right: -4px; background: var(--amber); color: #000; font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 8px; border: 1px solid var(--bg); }
+    
+    .container { max-width: 480px; margin: 0 auto; padding: 18px; }
+    .card { background: var(--surface-card); border: 1px solid var(--border); border-radius: 24px; padding: 18px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+    
+    /* Tamagotchi Hero */
+    .hero-tamagotchi { text-align: center; background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.25), var(--surface-card)); border: 1px solid rgba(99, 102, 241, 0.35); position: relative; overflow: hidden; }
+    .pet-sprite { font-size: 72px; margin: 12px 0; display: inline-block; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5)); animation: floatPet 2.5s infinite ease-in-out; }
+    @keyframes floatPet { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+    
+    .progress-track { background: #0c101c; height: 10px; border-radius: 99px; overflow: hidden; margin-top: 14px; border: 1px solid var(--border); }
+    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #6366f1, #38bdf8); transition: width 0.4s ease; }
+    
+    /* Stats Grid */
+    .stats-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .stat-pill { background: rgba(12, 16, 28, 0.6); border: 1px solid var(--border); padding: 12px; border-radius: 16px; }
+    .stat-pill b { display: block; font-size: 14px; margin-top: 2px; }
+    
+    /* Buttons & Actions */
+    .grid-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .btn-act { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px; text-align: left; color: var(--text); cursor: pointer; transition: all 0.2s; }
+    .btn-act:hover { border-color: var(--primary); background: #151b2e; }
+    .btn-act b { display: block; font-size: 15px; margin-top: 4px; color: var(--emerald); }
+    
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; border: none; padding: 10px 16px; border-radius: 14px; font-weight: 700; font-size: 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 12px; font-size: 11px; cursor: pointer; font-weight: 600; }
+    
+    /* Badges */
+    .badge { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-paid { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.25); }
+    .badge-pend { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.25); }
+    .badge-unrec { background: rgba(244, 63, 94, 0.15); color: var(--rose); border: 1px solid rgba(244, 63, 94, 0.25); }
+    
+    /* Navigation */
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(16, 21, 36, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 60; }
+    .nav-btn { background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .nav-btn.active { color: var(--accent); }
+    .nav-icon { font-size: 20px; }
+    
+    /* Auth Modal Screen */
+    #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; text-align: center; }
+    .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 28px; max-width: 360px; width: 100%; box-shadow: 0 12px 32px rgba(0,0,0,0.5); }
+    .pin-box { width: 100%; max-width: 220px; font-size: 26px; letter-spacing: 12px; text-align: center; background: #0c101c; border: 2px solid var(--primary); border-radius: 16px; padding: 12px; color: #fff; margin: 20px auto; outline: none; }
+    
+    /* Modals */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 90; display: none; align-items: flex-end; justify-content: center; padding: 16px; }
+    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; max-width: 440px; width: 100%; padding: 24px; }
+    input, select, textarea { width: 100%; background: #0c101c; border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size: 13px; margin: 6px 0 14px; outline: none; }
+    input:focus, select:focus { border-color: var(--primary); }
+    
+    .toast-msg { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; padding: 10px 20px; border-radius: 16px; box-shadow: 0 8px 20px rgba(99,102,241,0.4); z-index: 200; }
+  </style>
+</head>
+<body>
+
+  <!-- PANTALLA DE ACCESO (PIN o 1 Clic) -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div style="font-size: 48px; margin-bottom: 8px;">🛡️</div>
+      <h2 style="font-size: 20px; font-weight: 800;">FinQuest Vault</h2>
+      <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Seguridad local en tu dispositivo</p>
+      
+      <input type="password" id="input-pin" class="pin-box" maxlength="4" placeholder="••••" inputmode="numeric" onkeyup="checkPin(this.value)">
+
+      <button class="btn-primary" style="width: 100%; padding: 14px; font-size: 13px;" onclick="unlockApp()">Desbloquear Bóveda</button>
+      <button onclick="instantAccess()" style="margin-top: 14px; background: none; border: none; color: var(--muted); font-size: 11px; cursor: pointer; text-decoration: underline;">
+        Acceso rápido sin PIN
+      </button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="profile-pill">
+      <div class="avatar-box">
+        🦊
+        <span id="txt-lvl" class="badge-lvl">Nv.1</span>
+      </div>
+      <div>
+        <h1 style="font-size: 13px; font-weight: 800;">FinQuest Companion</h1>
+        <div style="display: flex; gap: 10px; font-size: 11px; margin-top: 2px;">
+          <span>🪙 <b id="txt-xp" style="color: var(--amber);">0 XP</b></span>
+          <span>❤️ <b id="txt-hp" style="color: var(--emerald);">100% HP</b></span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 6px;">
+      <button onclick="lockApp()" class="btn-outline">🔒 Bloquear</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- VISTA 1: MASCOTA Y ESTADÍSTICAS -->
+    <div id="tab-view-pet" class="view-panel">
+      <div class="card hero-tamagotchi">
+        <div style="display: inline-block; background: rgba(16, 185, 129, 0.15); color: var(--emerald); font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          Ánimo: Guardián Activo ⚡
+        </div>
+        <div>
+          <div class="pet-sprite" id="pet-avatar">🦊</div>
+          <div id="pet-accessory" style="font-size: 26px; margin-top: -24px; margin-bottom: 8px;">🎧</div>
+        </div>
+        <h2 style="font-size: 18px; font-weight: 800;">Zen Master Financiero</h2>
+        <p style="font-size: 11px; color: var(--muted); max-width: 280px; margin: 4px auto 0;">Aprueba tus gastos estratégicos y registra quincenas para evolucionar tu avatar.</p>
+
+        <div class="progress-track">
+          <div id="bar-xp" class="progress-fill" style="width: 0%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 6px;">
+          <span>Experiencia: <b id="lbl-xp" style="color: #fff;">0 / 100</b></span>
+          <span>Próximo: <b>Nv. 2</b></span>
+        </div>
+      </div>
+
+      <!-- MATRIZ DE ATRIBUTOS DEL PERSONAJE -->
+      <div class="card">
+        <span style="font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">⚡ Atributos del Tamagotchi</span>
+        <div class="stats-matrix">
+          <div class="stat-pill">
+            <span style="font-size: 10px; color: var(--muted);">💪 Fuerza (Salud/Gym)</span>
+            <b id="val-str" style="color: var(--rose);">Nv. 1 (10 pts)</b>
+          </div>
+          <div class="stat-pill">
+            <span style="font-size: 10px; color: var(--muted);">🧠 Intelecto (Estudio/Trabajo)</span>
+            <b id="val-int" style="color: var(--accent);">Nv. 1 (5 pts)</b>
+          </div>
+          <div class="stat-pill">
+            <span style="font-size: 10px; color: var(--muted);">🎯 Destreza (Moto/Equipos)</span>
+            <b id="val-dex" style="color: var(--amber);">Nv. 1 (15 pts)</b>
+          </div>
+          <div class="stat-pill">
+            <span style="font-size: 10px; color: var(--muted);">✨ Espíritu (Perro/Hogar)</span>
+            <b id="val-spi" style="color: var(--emerald);">Nv. 1 (10 pts)</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 2: GASTOS CON HABILIDADES -->
+    <div id="tab-view-expenses" class="view-panel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div>
+          <h2 style="font-size: 16px; font-weight: 800;">Gastos Recurrentes</h2>
+          <p style="font-size: 11px; color: var(--muted);">Aprobar pagos da puntos directos a tu avatar</p>
+        </div>
+        <button class="btn-primary" onclick="openModal('modal-expense')">+ Añadir Gasto</button>
+      </div>
+
+      <div id="expenses-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    <!-- VISTA 3: INGRESOS LIMPIOS Y FLEXIBLES -->
+    <div id="tab-view-income" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 14px;">
+        <h2 style="font-size: 16px; font-weight: 800;">Gestión de Ingresos</h2>
+        <p style="font-size: 11px; color: var(--muted);">Registra la Q1 o añade ingresos inesperados y alertas</p>
+      </div>
+
+      <div class="card">
+        <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase;">Registrar Ingresos Habituales</span>
+        <div class="grid-actions">
+          <button class="btn-act" onclick="promptIncome('Quincena 1 (Q1)', 3800000)">
+            <span style="font-size: 10px; color: var(--muted);">Primeros 5 días</span>
+            <b>+ Registrar Q1</b>
+          </button>
+          <button class="btn-act" onclick="promptIncome('Quincena 2 (Q2)', 3600000)">
+            <span style="font-size: 10px; color: var(--muted);">Mitad de mes</span>
+            <b>+ Registrar Q2</b>
+          </button>
+          <button class="btn-act" onclick="promptIncome('Docencia Universidad', 1200000)">
+            <span style="font-size: 10px; color: var(--muted);">Cátedra / Módulo</span>
+            <b style="color: var(--accent);">+ Docencia</b>
+          </button>
+          <button class="btn-act" onclick="promptIncome('Ingreso Inesperado / Extra', 500000)">
+            <span style="font-size: 10px; color: var(--muted);">Premio / Bonificación</span>
+            <b style="color: var(--amber);">✨ Inesperado</b>
+          </button>
+        </div>
+
+        <button onclick="promptUnreceived()" style="width: 100%; margin-top: 12px; background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--rose); padding: 12px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: left;">
+          ⚠️ Registrar "Ingreso Esperado No Recibido" (Alerta de cobro)
+        </button>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase;">Historial de Ingresos</span>
+          <button onclick="clearIncomes()" style="background: none; border: none; color: var(--rose); font-size: 10px; font-weight: 700; cursor: pointer;">Limpiar</button>
+        </div>
+        <div id="income-history"></div>
+      </div>
+    </div>
+
+    <!-- VISTA 4: MISIONES Y FESTIVALES -->
+    <div id="tab-view-missions" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 14px;">
+        <h2 style="font-size: 16px; font-weight: 800;">Misiones & Objetivos</h2>
+        <p style="font-size: 11px; color: var(--muted);">Compromisos y experiencias del mundo real</p>
+      </div>
+
+      <div class="card" style="border-color: rgba(16, 185, 129, 0.4); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="font-size: 26px;">✅</span>
+          <div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <b style="font-size: 13px;">Compromiso DIAN</b>
+              <span class="badge badge-paid">¡Listo!</span>
+            </div>
+            <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">Cancelado sin costo financiero</p>
+          </div>
+        </div>
+        <b style="font-size: 13px; color: var(--emerald);">$1.000.000</b>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <b style="font-size: 13px;">Festival Ritvales</b>
+            <p style="font-size: 11px; color: var(--amber);">Abono final pendiente antes de Octubre</p>
+          </div>
+          <b style="font-size: 13px; color: var(--amber);">$500.000</b>
+        </div>
+        <div class="progress-track">
+          <div style="width: 70%; height: 100%; background: var(--amber);"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px;">
+          <span style="color: var(--muted);">Último abono de $500k</span>
+          <a href="javascript:void(0)" onclick="completeRitvales()" style="color: var(--accent); font-weight: 800; text-decoration: none;">Marcar Pagado (+50 XP)</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <b style="font-size: 13px;">Paracaidismo</b>
+            <p style="font-size: 11px; color: var(--muted);">Meta: $1.5M para Octubre</p>
+          </div>
+          <b style="font-size: 13px; color: var(--accent);">$1.500.000</b>
+        </div>
+        <div class="progress-track">
+          <div id="bar-para" style="width: 15%; height: 100%; background: var(--primary);"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px;">
+          <span id="lbl-para" style="color: var(--muted);">$225.000 aportados</span>
+          <a href="javascript:void(0)" onclick="abonoParacaidismo()" style="color: var(--accent); font-weight: 800; text-decoration: none;">+ Abonar $150k</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 5: ICLOUD & BANCOS -->
+    <div id="tab-view-sync" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 14px;">
+        <h2 style="font-size: 16px; font-weight: 800;">Sincronización iCloud & Bancos</h2>
+        <p style="font-size: 11px; color: var(--muted);">Captura compras de Bancolombia/BBVA automáticamente</p>
+      </div>
+
+      <div class="card">
+        <span style="font-size: 11px; font-weight: 800; color: var(--accent); text-transform: uppercase;">Procesador de Alertas</span>
+        <p style="font-size: 11px; color: var(--muted); margin-top: 4px;">Pega el texto de cualquier notificación o correo:</p>
+        <textarea id="box-sms" rows="2" placeholder="Ej: Bancolombia le informa compra por $68.000 en Restaurante..."></textarea>
+        <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="processTextAlert()">⚡ Extraer Gasto y Ganar XP</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="nav-bar">
+    <button class="nav-btn active" id="btn-tab-pet" onclick="showTab('pet')">
+      <span class="nav-icon">🦊</span>
+      <span>Mascota</span>
+    </button>
+    <button class="nav-btn" id="btn-tab-expenses" onclick="showTab('expenses')">
+      <span class="nav-icon">🧾</span>
+      <span>Gastos</span>
+    </button>
+    <button class="nav-btn" id="btn-tab-income" onclick="showTab('income')">
+      <span class="nav-icon">💵</span>
+      <span>Ingresos</span>
+    </button>
+    <button class="nav-btn" id="btn-tab-missions" onclick="showTab('missions')">
+      <span class="nav-icon">🎯</span>
+      <span>Misiones</span>
+    </button>
+    <button class="nav-btn" id="btn-tab-sync" onclick="showTab('sync')">
+      <span class="nav-icon">✉️</span>
+      <span>iCloud</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: AÑADIR GASTO -->
+  <div id="modal-expense" class="modal-overlay">
+    <div class="modal-box">
+      <b style="font-size: 15px;">Añadir Gasto y Vincular Atributo</b>
+      <p style="font-size: 11px; color: var(--muted); margin-top: 2px;">Aumenta las estadísticas de tu Tamagotchi al pagarlo.</p>
+      
+      <div style="margin-top: 14px;">
+        <label style="font-size: 11px; color: var(--muted);">Concepto</label>
+        <input type="text" id="inp-exp-title" placeholder="Ej. Proteína / Gasolina Moto / Curso">
+
+        <label style="font-size: 11px; color: var(--muted);">Monto ($ COP)</label>
+        <input type="number" id="inp-exp-amount" placeholder="Ej. 180000">
+
+        <label style="font-size: 11px; color: var(--muted);">Periodo / Vencimiento</label>
+        <input type="text" id="inp-exp-due" placeholder="Ej. Mitad de mes (Q2)">
+
+        <label style="font-size: 11px; color: var(--muted);">Atributo que desarrolla</label>
+        <select id="inp-exp-skill">
+          <option value="STR">💪 Fuerza (Salud, Gym, Alimentación)</option>
+          <option value="INT">🧠 Intelecto (Estudio, Asesorías, Libros)</option>
+          <option value="DEX">🎯 Destreza (Moto, Producción Musical, Equipos)</option>
+          <option value="SPI">✨ Espíritu (Perro, Descanso, Bienestar)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-outline" style="flex: 1; padding: 12px;" onclick="closeModal('modal-expense')">Cancelar</button>
+        <button class="btn-primary" style="flex: 1; padding: 12px;" onclick="addExpense()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Limpieza de datos obsoletos
+    if (!localStorage.getItem('fq_v10_reset')) {
+      localStorage.removeItem('fq_incomes');
+      localStorage.setItem('fq_v10_reset', 'true');
+    }
+
+    function checkPin(val) {
+      if (val.length === 4) unlockApp();
+    }
+    function unlockApp() {
+      document.getElementById('auth-screen').style.display = 'none';
+    }
+    function instantAccess() {
+      document.getElementById('auth-screen').style.display = 'none';
+    }
+    function lockApp() {
+      document.getElementById('input-pin').value = '';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+
+    // App State
+    const state = {
+      xp: 0, level: 1, paracaidismo: 225000,
+      skills: { STR: 10, INT: 5, DEX: 15, SPI: 10 },
+      expenses: [
+        { id: '1', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', skill: 'DEX', sName: 'Destreza', paid: false },
+        { id: '2', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 del mes', skill: 'SPI', sName: 'Espíritu', paid: true },
+        { id: '3', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', skill: 'DEX', sName: 'Destreza', paid: false },
+        { id: '4', title: 'Gimnasio', amount: 250000, due: 'Día 1 del mes', skill: 'STR', sName: 'Fuerza', paid: true },
+        { id: '5', title: 'Cuidado Perro', amount: 400000, due: 'Recurrente', skill: 'SPI', sName: 'Espíritu', paid: true },
+        { id: '6', title: 'Vida Personal & Salidas', amount: 800000, due: 'Quincenal', skill: 'SPI', sName: 'Espíritu', paid: false }
+      ],
+      incomes: JSON.parse(localStorage.getItem('fq_incomes') || '[]')
+    };
+
+    function renderExpenses() {
+      const box = document.getElementById('expenses-list');
+      box.innerHTML = '';
+      state.expenses.forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.marginBottom = '0px';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.style.opacity = e.paid ? '0.7' : '1';
+        div.innerHTML = `
+          <div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <b style="font-size: 13px; text-decoration: ${e.paid ? 'line-through' : 'none'};">${e.title}</b>
+              <span class="badge ${e.paid ? 'badge-paid' : 'badge-pend'}">${e.paid ? 'PAGADO' : 'PENDIENTE'}</span>
+            </div>
+            <div style="font-size: 11px; color: var(--muted); margin-top: 3px;">⏱️ ${e.due} &bull; +${e.sName}</div>
+          </div>
+          <div style="text-align: right;">
+            <b style="font-size: 14px;">$${e.amount.toLocaleString('es-CO')}</b>
+            <div style="margin-top: 4px;">
+              <button class="btn-outline" onclick="toggleExpense('${e.id}')">${e.paid ? 'Desmarcar' : 'Aprobar'}</button>
+            </div>
+          </div>
+        `;
+        box.appendChild(div);
+      });
+    }
+
+    function toggleExpense(id) {
+      const item = state.expenses.find(x => x.id === id);
+      if (item) {
+        item.paid = !item.paid;
+        if (item.paid) {
+          state.skills[item.skill] += 5;
+          gainXP(25, `¡Aprobado! +25 XP y +5 en ${item.sName}`);
+          updateSkillsUI();
+        }
+        renderExpenses();
+      }
+    }
+
+    function updateSkillsUI() {
+      document.getElementById('val-str').innerText = `Nv. ${Math.floor(state.skills.STR / 10)} (${state.skills.STR} pts)`;
+      document.getElementById('val-int').innerText = `Nv. ${Math.floor(state.skills.INT / 10)} (${state.skills.INT} pts)`;
+      document.getElementById('val-dex').innerText = `Nv. ${Math.floor(state.skills.DEX / 10)} (${state.skills.DEX} pts)`;
+      document.getElementById('val-spi').innerText = `Nv. ${Math.floor(state.skills.SPI / 10)} (${state.skills.SPI} pts)`;
+    }
+
+    function renderIncomes() {
+      const box = document.getElementById('income-history');
+      box.innerHTML = '';
+      if (state.incomes.length === 0) {
+        box.innerHTML = '<p style="font-size: 11px; color: var(--muted); padding: 6px 0;">No hay ingresos registrados aún. Usa los botones superiores.</p>';
+        return;
+      }
+      state.incomes.forEach((inc, idx) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '8px 0';
+        row.style.borderBottom = '1px solid var(--border)';
+        row.style.fontSize = '12px';
+        row.innerHTML = `
+          <div>
+            <b>${inc.title}</b>
+            <span class="badge ${inc.alert ? 'badge-unrec' : 'badge-paid'}" style="margin-left: 4px;">${inc.alert ? 'POR COBRAR' : 'RECIBIDO'}</span>
+            <div style="font-size: 10px; color: var(--muted);">${inc.date}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <b style="color: ${inc.alert ? 'var(--rose)' : 'var(--emerald)'};">+$${inc.amount.toLocaleString('es-CO')}</b>
+            <button onclick="delIncome(${idx})" style="background: none; border: none; color: var(--rose); cursor: pointer;">🗑️</button>
+          </div>
+        `;
+        box.appendChild(row);
+      });
+    }
+
+    function promptIncome(title, defAmt) {
+      const amt = prompt(`Monto a ingresar para ${title} ($ COP):`, defAmt);
+      if (amt && !isNaN(amt)) {
+        state.incomes.unshift({ title, amount: parseInt(amt), date: 'Hoy', alert: false });
+        localStorage.setItem('fq_incomes', JSON.stringify(state.incomes));
+        gainXP(25, `+$${parseInt(amt).toLocaleString('es-CO')} ingresados (+25 XP)`);
+        renderIncomes();
+      }
+    }
+
+    function promptUnreceived() {
+      const title = prompt('¿Qué cobro esperado sigue pendiente? (ej. Honorario Cliente, Clase):', 'Honorario pendiente');
+      if (title) {
+        const amt = prompt('Monto adeudado ($ COP):', '1200000');
+        if (amt && !isNaN(amt)) {
+          state.incomes.unshift({ title, amount: parseInt(amt), date: '⚠️ PENDIENTE', alert: true });
+          localStorage.setItem('fq_incomes', JSON.stringify(state.incomes));
+          showToast('Alerta de cobro agregada al radar');
+          renderIncomes();
+        }
+      }
+    }
+
+    function delIncome(idx) {
+      state.incomes.splice(idx, 1);
+      localStorage.setItem('fq_incomes', JSON.stringify(state.incomes));
+      renderIncomes();
+      showToast('Registro eliminado');
+    }
+
+    function clearIncomes() {
+      if (confirm('¿Vaciar todo el historial de ingresos?')) {
+        state.incomes = [];
+        localStorage.setItem('fq_incomes', JSON.stringify([]));
+        renderIncomes();
+        showToast('Historial limpiado');
+      }
+    }
+
+    function addExpense() {
+      const title = document.getElementById('inp-exp-title').value;
+      const amount = parseInt(document.getElementById('inp-exp-amount').value);
+      const due = document.getElementById('inp-exp-due').value || 'Quincenal';
+      const skill = document.getElementById('inp-exp-skill').value;
+      const names = { STR: 'Fuerza', INT: 'Intelecto', DEX: 'Destreza', SPI: 'Espíritu' };
+      
+      if (title && !isNaN(amount)) {
+        state.expenses.unshift({ id: Date.now().toString(), title, amount, due, skill, sName: names[skill], paid: false });
+        renderExpenses();
+        closeModal('modal-expense');
+        showToast('Gasto agregado a la lista');
+      } else alert('Ingresa un nombre y monto válidos');
+    }
+
+    function processTextAlert() {
+      const txt = document.getElementById('box-sms').value;
+      const match = txt.match(/\$?\s?([0-9.,]+)/);
+      if (match) {
+        const val = parseInt(match[1].replace(/\./g, '').replace(/,/g, ''));
+        gainXP(20, `Gasto detectado: $${val.toLocaleString('es-CO')} (+20 XP)`);
+        document.getElementById('box-sms').value = '';
+      } else alert('No se detectó un monto en el texto ingresado.');
+    }
+
+    function completeRitvales() {
+      gainXP(50, '¡Ritvales liquidado! +50 XP para tu avatar');
+    }
+
+    function abonoParacaidismo() {
+      state.paracaidismo += 150000;
+      document.getElementById('lbl-para').innerText = `$${state.paracaidismo.toLocaleString('es-CO')} aportados`;
+      const p = Math.min(100, Math.round((state.paracaidismo / 1500000) * 100));
+      document.getElementById('bar-para').style.width = p + '%';
+      gainXP(30, 'Abono registrado a Paracaidismo (+30 XP)');
+    }
+
+    function gainXP(pts, msg) {
+      state.xp += pts;
+      if (state.xp >= 100) {
+        state.level += 1;
+        state.xp -= 100;
+        document.getElementById('txt-lvl').innerText = `Nv.${state.level}`;
+        showToast(`🎉 ¡SUBISTE AL NIVEL ${state.level}!`);
+      }
+      document.getElementById('bar-xp').style.width = `${state.xp}%`;
+      document.getElementById('lbl-xp').innerText = `${state.xp} / 100`;
+      document.getElementById('txt-xp').innerText = `${state.xp} XP`;
+      showToast(msg);
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.view-panel').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-view-${tab}`).style.display = 'block';
+      document.getElementById(`btn-tab-${tab}`).classList.add('active');
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast-msg';
+      t.innerText = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2400);
+    }
+
+    renderExpenses();
+    renderIncomes();
+    updateSkillsUI();
+  </script>
+</body>
+</html>    .progress-fill { background: linear-gradient(90deg, #6366f1, #fbbf24); height: 100%; border-radius: 99px; transition: width 0.4s; }
     .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .btn-action { background: #1e293b; border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: left; color: var(--text); cursor: pointer; }
     .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
