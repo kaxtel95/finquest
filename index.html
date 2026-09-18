@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinQuest Pro - Medellín RPG Edition</title>
+  <title>FinQuest Pro - Medellín Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: #070a13; color: #f8fafc; min-height: 100vh; padding-bottom: 100px; }
     
-    /* Top Header */
+    /* Header */
     .top-header { position: sticky; top: 0; z-index: 50; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid #1e293b; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
     .user-pill { display: flex; align-items: center; gap: 12px; }
     .avatar-icon { position: relative; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
@@ -90,23 +90,20 @@
       </div>
     </div>
     <div style="display: flex; gap: 6px;">
-      <button onclick="showBackupPrompt()" class="btn-action-sm" title="Exportar o importar tus datos">💾 Respaldo</button>
-      <button onclick="resetDataPrompt()" class="btn-action-sm" style="color: #f43f5e;" title="Reiniciar app">⚙️ Reset</button>
+      <button onclick="showBackupPrompt()" class="btn-action-sm">💾 Respaldo</button>
+      <button onclick="resetDataPrompt()" class="btn-action-sm" style="color: #f43f5e;">⚙️ Reset</button>
     </div>
   </header>
 
   <main class="main-wrap">
 
-    <!-- PESTAÑA 1: MASCOTA & ANÁLISIS IA COMPLETO -->
+    <!-- PESTAÑA 1: MASCOTA & COACH -->
     <div id="panel-pet" class="view-section">
-      
-      <!-- DASHBOARD ANÁLISIS FINANCIERO IA -->
       <div class="ia-coach-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 11px; font-weight: 900; color: #a5b4fc; text-transform: uppercase;">🤖 Diagnóstico IA Financiero</span>
+          <span style="font-size: 11px; font-weight: 900; color: #a5b4fc; text-transform: uppercase;">🤖 Coach Financiero Nea</span>
           <span id="ia-alert-badge" class="tag tag-paid">Saludable</span>
         </div>
-        
         <div class="kpi-grid">
           <div class="kpi-box">
             <span style="font-size: 10px; color: #94a3b8;">Ingresos</span>
@@ -121,103 +118,45 @@
             <div id="kpi-balance" style="font-size: 14px; font-weight: 900; color: #38bdf8; margin-top: 3px;">$0</div>
           </div>
         </div>
-
-        <p id="ia-advice-text" style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">
-          Cargando análisis de quincena...
-        </p>
+        <p id="ia-advice-text" style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">Cargando análisis...</p>
       </div>
 
-      <!-- PET BANNER -->
       <div class="glass-card pet-box">
-        <span id="pet-status-tag" style="font-size: 10px; font-weight: 900; background: rgba(16,185,129,0.15); color: #34d399; padding: 4px 10px; border-radius: 99px;">
-          Estado: Firme & Activo ⚡
-        </span>
+        <span style="font-size: 10px; font-weight: 900; background: rgba(16,185,129,0.15); color: #34d399; padding: 4px 10px; border-radius: 99px;">Estado: Firme & Activo ⚡</span>
         <div>
           <div class="pet-anim" id="sprite-pet">🥟</div>
           <div id="sprite-item" style="font-size: 26px; margin-top: -24px; margin-bottom: 6px;">🎧</div>
         </div>
         <h2 style="font-size: 18px; font-weight: 800;" id="pet-title-name">Empanada Nea</h2>
-        
-        <div class="bar-track">
-          <div id="bar-xp-fill" class="bar-fill" style="width: 0%;"></div>
-        </div>
+        <div class="bar-track"><div id="bar-xp-fill" class="bar-fill" style="width: 0%;"></div></div>
         <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 6px;">
           <span>Experiencia: <b id="txt-xp-ratio" style="color: #fff;">0 / 100 XP</b></span>
           <span>Siguiente Nivel</span>
         </div>
       </div>
 
-      <!-- SELECTOR DE PERSONAJE -->
       <div class="glass-card">
         <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">🎮 Escoge tu Personaje</span>
         <div class="char-select-grid">
-          <div class="char-card active" id="card-empanada" onclick="setAvatar('🥟', 'Empanada Nea', 'card-empanada')">
-            <div style="font-size: 26px;">🥟</div>
-            <div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Empanada</div>
-          </div>
-          <div class="char-card" id="card-cafe" onclick="setAvatar('☕', 'Tinto Nea', 'card-cafe')">
-            <div style="font-size: 26px;">☕</div>
-            <div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Tinto Cold</div>
-          </div>
-          <div class="char-card" id="card-cono" onclick="setAvatar('🍦', 'Conito Cremoso', 'card-cono')">
-            <div style="font-size: 26px;">🍦</div>
-            <div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Conito</div>
-          </div>
-          <div class="char-card" id="card-zorro" onclick="setAvatar('🦊', 'Zorro FinTech', 'card-zorro')">
-            <div style="font-size: 26px;">🦊</div>
-            <div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Zorro</div>
-          </div>
+          <div class="char-card active" id="card-empanada" onclick="setAvatar('🥟', 'Empanada Nea', 'card-empanada')"><div style="font-size: 26px;">🥟</div><div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Empanada</div></div>
+          <div class="char-card" id="card-cafe" onclick="setAvatar('☕', 'Tinto Nea', 'card-cafe')"><div style="font-size: 26px;">☕</div><div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Tinto Cold</div></div>
+          <div class="char-card" id="card-cono" onclick="setAvatar('🍦', 'Conito Cremoso', 'card-cono')"><div style="font-size: 26px;">🍦</div><div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Conito</div></div>
+          <div class="char-card" id="card-zorro" onclick="setAvatar('🦊', 'Zorro FinTech', 'card-zorro')"><div style="font-size: 26px;">🦊</div><div style="font-size: 10px; font-weight: 800; margin-top: 4px;">Zorro</div></div>
         </div>
       </div>
 
-      <!-- MATRIZ DE ATRIBUTOS (HABILIDADES) -->
       <div class="glass-card">
         <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">⚡ Atributos del Avatar</span>
         <div class="stats-matrix">
-          <div class="stat-chip">
-            <span style="font-size: 11px; color: #94a3b8;">💪 Fuerza (Salud/Gym)</span>
-            <div id="chip-str" style="font-size: 14px; font-weight: 900; color: #f43f5e; margin-top: 2px;">Nv. 1 (10 pts)</div>
-          </div>
-          <div class="stat-chip">
-            <span style="font-size: 11px; color: #94a3b8;">🧠 Intelecto (Estudio/Trabajo)</span>
-            <div id="chip-int" style="font-size: 14px; font-weight: 900; color: #38bdf8; margin-top: 2px;">Nv. 1 (5 pts)</div>
-          </div>
-          <div class="stat-chip">
-            <span style="font-size: 11px; color: #94a3b8;">🎯 Destreza (Moto/Equipos)</span>
-            <div id="chip-dex" style="font-size: 14px; font-weight: 900; color: #fbbf24; margin-top: 2px;">Nv. 1 (15 pts)</div>
-          </div>
-          <div class="stat-chip">
-            <span style="font-size: 11px; color: #94a3b8;">✨ Espíritu (Perro/Hogar)</span>
-            <div id="chip-spi" style="font-size: 14px; font-weight: 900; color: #34d399; margin-top: 2px;">Nv. 1 (10 pts)</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ARMARIO DE EXPERIENCIAS -->
-      <div class="glass-card">
-        <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">👕 Armario Desbloqueado</span>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; text-align: center;">
-          <div onclick="equipItem('🎧')" style="background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; cursor: pointer;">
-            <div style="font-size: 22px;">🎧</div>
-            <div style="font-size: 10px; margin-top: 2px;">DJ Set</div>
-          </div>
-          <div onclick="equipItem('🪂')" style="background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; cursor: pointer;">
-            <div style="font-size: 22px;">🪂</div>
-            <div style="font-size: 10px; margin-top: 2px;">Paracaídas</div>
-          </div>
-          <div onclick="equipItem('🪩')" style="background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; cursor: pointer;">
-            <div style="font-size: 22px;">🪩</div>
-            <div style="font-size: 10px; margin-top: 2px;">Ritvales</div>
-          </div>
-          <div onclick="equipItem('🏍️')" style="background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; cursor: pointer;">
-            <div style="font-size: 22px;">🏍️</div>
-            <div style="font-size: 10px; margin-top: 2px;">Casco Moto</div>
-          </div>
+          <div class="stat-chip"><span style="font-size: 11px; color: #94a3b8;">💪 Fuerza (Salud/Gym)</span><div id="chip-str" style="font-size: 14px; font-weight: 900; color: #f43f5e; margin-top: 2px;">Nv. 1 (10 pts)</div></div>
+          <div class="stat-chip"><span style="font-size: 11px; color: #94a3b8;">🧠 Intelecto (Estudio)</span><div id="chip-int" style="font-size: 14px; font-weight: 900; color: #38bdf8; margin-top: 2px;">Nv. 1 (5 pts)</div></div>
+          <div class="stat-chip"><span style="font-size: 11px; color: #94a3b8;">🎯 Destreza (Moto/DJ)</span><div id="chip-dex" style="font-size: 14px; font-weight: 900; color: #fbbf24; margin-top: 2px;">Nv. 1 (15 pts)</div></div>
+          <div class="stat-chip"><span style="font-size: 11px; color: #94a3b8;">✨ Espíritu (Hogar)</span><div id="chip-spi" style="font-size: 14px; font-weight: 900; color: #34d399; margin-top: 2px;">Nv. 1 (10 pts)</div></div>
         </div>
       </div>
     </div>
 
-    <!-- PESTAÑA 2: GASTOS (ORDENADOS: PENDIENTES PRIMERO, PAGADOS AL FINAL) -->
+    <!-- PESTAÑA 2: GASTOS -->
     <div id="panel-expenses" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <div>
@@ -232,16 +171,14 @@
         <button class="segment-btn" id="btn-subtab-daily" onclick="switchExpenseSubtab('daily')">☕ Diarios & Hormiga</button>
       </div>
 
-      <!-- SECCIÓN 1: PENDIENTES -->
       <span style="font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase;">⚠️ Pendientes de Pago</span>
       <div id="expenses-pending-box" style="display: flex; flex-direction: column; gap: 8px; margin: 8px 0 20px;"></div>
 
-      <!-- SECCIÓN 2: PAGADOS -->
       <span style="font-size: 11px; font-weight: 900; color: #34d399; text-transform: uppercase;">✅ Aprobados / Pagados del Mes</span>
       <div id="expenses-paid-box" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;"></div>
     </div>
 
-    <!-- PESTAÑA 3: INGRESOS COMPLETOS CON TODAS LAS CATEGORÍAS -->
+    <!-- PESTAÑA 3: INGRESOS (RESTAURADA AL 100%) -->
     <div id="panel-income" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
         <h2 style="font-size: 16px; font-weight: 800;">Gestión de Ingresos</h2>
@@ -283,7 +220,7 @@
       </div>
     </div>
 
-    <!-- PESTAÑA 4: MISIONES CON RECOMENDACIONES & INSIGNIAS -->
+    <!-- PESTAÑA 4: MISIONES -->
     <div id="panel-missions" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <div>
@@ -383,8 +320,7 @@
   </div>
 
   <script>
-    // CLAVE DE PERSISTENCIA FIJA E INMUTABLE
-    const STORAGE_KEY = 'fq_permanent_core';
+    const STORAGE_KEY = 'fq_permanent_core_v2';
 
     function loadCoreData() {
       const saved = localStorage.getItem(STORAGE_KEY);
