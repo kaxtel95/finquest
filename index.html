@@ -1,1 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FinQuest Vault</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #131b2e;
+      --border: #1f2c47;
+      --accent: #6366f1;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; }
+    .header { position: sticky; top: 0; z-index: 30; background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .avatar-badge { position: relative; width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, #f59e0b, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .lvl-tag { position: absolute; bottom: -4px; right: -4px; background: #fbbf24; color: #000; font-size: 9px; font-weight: 900; padding: 1px 5px; border-radius: 10px; }
+    .container { max-width: 480px; margin: 0 auto; padding: 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
+    .pet-hero { text-align: center; background: radial-gradient(circle at top, #1e1b4b, var(--card)); border: 1px solid rgba(99, 102, 241, 0.3); }
+    .pet-bounce { animation: bounce 2s infinite ease-in-out; font-size: 64px; margin: 16px 0; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .progress-bar { background: #1e293b; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 12px; }
+    .progress-fill { background: linear-gradient(90deg, #6366f1, #fbbf24); height: 100%; border-radius: 99px; transition: width 0.4s; }
+    .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .btn-action { background: #1e293b; border: 1px solid var(--border); border-radius: 14px; padding: 12px; text-align: left; color: var(--text); cursor: pointer; }
+    .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+    .badge-paid { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 27, 46, 0.98); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 40; }
+    .tab-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; font-weight: 600; gap: 4px; }
+    .tab-item.active { color: #fbbf24; }
+    .tab-icon { font-size: 20px; }
+    .btn-approve { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .btn-paid { background: #334155; color: var(--text-muted); }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #6366f1; color: #fff; font-size: 12px; font-weight: 700; padding: 8px 16px; border-radius: 20px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    
+    /* Security Overlay */
+    #lock-screen { position: fixed; inset: 0; background: #090d16; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+    .pin-display { display: flex; gap: 12px; margin: 24px 0; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #6366f1; background: transparent; transition: all 0.2s; }
+    .pin-dot.filled { background: #6366f1; box-shadow: 0 0 10px #6366f1; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 72px); gap: 16px; }
+    .keypad-btn { width: 72px; height: 72px; border-radius: 36px; background: #131b2e; border: 1px solid var(--border); color: #fff; font-size: 22px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+    .keypad-btn:active { background: #1e293b; }
+    .btn-del { background: none; border: none; color: #ef4444; font-size: 14px; cursor: pointer; padding: 4px; margin-left: 8px; }
+    .btn-del:hover { opacity: 0.8; }
+  </style>
+</head>
+<body>
 
+  <!-- PANTALLA DE SEGURIDAD CON PIN -->
+  <div id="lock-screen">
+    <div style="font-size: 40px; margin-bottom: 8px;">🛡️</div>
+    <h2 style="font-size: 18px; font-weight: bold;">FinQuest Seguro</h2>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Ingresa tu código PIN de 4 dígitos</p>
+    
+    <div class="pin-display">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+
+    <div class="keypad">
+      <button class="keypad-btn" onclick="pressKey('1')">1</button>
+      <button class="keypad-btn" onclick="pressKey('2')">2</button>
+      <button class="keypad-btn" onclick="pressKey('3')">3</button>
+      <button class="keypad-btn" onclick="pressKey('4')">4</button>
+      <button class="keypad-btn" onclick="pressKey('5')">5</button>
+      <button class="keypad-btn" onclick="pressKey('6')">6</button>
+      <button class="keypad-btn" onclick="pressKey('7')">7</button>
+      <button class="keypad-btn" onclick="pressKey('8')">8</button>
+      <button class="keypad-btn" onclick="pressKey('9')">9</button>
+      <button class="keypad-btn" onclick="lockApp()" style="font-size: 13px; color: #ef4444;">🔒 Bloq</button>
+      <button class="keypad-btn" onclick="pressKey('0')">0</button>
+      <button class="keypad-btn" onclick="deleteKey()" style="font-size: 16px;">⌫</button>
+    </div>
+    <p style="font-size: 11px; color: #64748b; margin-top: 24px;">PIN predeterminado inicial: <b>1234</b></p>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div class="header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="avatar-badge">
+        🦊
+        <span id="level-badge" class="lvl-tag">Nv.1</span>
+      </div>
+      <div>
+        <div style="font-size: 13px; font-weight: bold;">FinQuest Companion</div>
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 10px;">
+          <span>🪙 <b id="stat-xp" style="color: #fbbf24;">45 XP</b></span>
+          <span>❤️ <b id="stat-hp" style="color: #34d399;">100% HP</b></span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button onclick="changePinPrompt()" style="background: #1e293b; color: #cbd5e1; border: 1px solid var(--border); padding: 6px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer;">
+        🔑 PIN
+      </button>
+      <button onclick="lockApp()" style="background: #1e293b; color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); padding: 6px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer;">
+        🔒 Bloquear
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- PANEL 1: MASCOTA -->
+    <div id="view-pet" class="view-panel">
+      <div class="card pet-hero">
+        <div style="display: inline-block; font-size: 11px; background: rgba(30,41,59,0.8); padding: 4px 10px; border-radius: 8px; color: #34d399;">
+          Ánimo: <b>Impecable 🧘‍♂️</b>
+        </div>
+        <div class="pet-bounce" id="pet-avatar">🦊</div>
+        <div id="pet-item" style="font-size: 24px; margin-top: -30px; margin-bottom: 12px;">🎧</div>
+        <h2 style="font-size: 16px; font-weight: 900;">Zen Master Financiero</h2>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Datos cifrados localmente en tu dispositivo.</p>
+        
+        <div class="progress-bar">
+          <div id="xp-bar" class="progress-fill" style="width: 45%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 6px;">
+          <span>Progreso: <b id="xp-label">45 / 100 XP</b></span>
+          <span>Siguiente: <b>Nv. 2</b></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">👕 Armario de Experiencias</span>
+          <span style="font-size: 10px; color: #818cf8;">Toca para equipar</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;">
+          <div onclick="equipItem('🎧')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🎧</div>
+            <div style="font-size: 9px; margin-top: 4px;">DJ Set</div>
+          </div>
+          <div onclick="equipItem('🪂')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🪂</div>
+            <div style="font-size: 9px; margin-top: 4px;">Paracaídas</div>
+          </div>
+          <div onclick="equipItem('🪩')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🪩</div>
+            <div style="font-size: 9px; margin-top: 4px;">Ritvales</div>
+          </div>
+          <div onclick="equipItem('🏍️')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🏍️</div>
+            <div style="font-size: 9px; margin-top: 4px;">Casco Moto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: GASTOS -->
+    <div id="view-expenses" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Gastos Recurrentes</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Aprueba con 1 toque al pagar para ganar experiencia</p>
+      </div>
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 16px; padding: 12px; display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 20px;">🔔</span>
+        <div style="font-size: 11px;">
+          <b style="color: #fbbf24;">Alerta Quincena 2 (Mitad de mes):</b>
+          <div style="color: #cbd5e1;">Moto ($800.000) &bull; Vida Personal ($800.000)</div>
+        </div>
+      </div>
+      <div id="expenses-list"></div>
+    </div>
+
+    <!-- PANEL 3: INGRESOS CON MEMORIA Y EDICIÓN -->
+    <div id="view-income" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Ingresos con Memoria</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Registra desde la Q2 de Diciembre con el monto que definas</p>
+      </div>
+      <div class="card">
+        <span style="font-size: 10px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Valores Habituales (Toca para editar monto)</span>
+        <div class="grid-btns">
+          <button class="btn-action" onclick="promptAddIncome('Q2 Diciembre (Mitad mes)', 3600000)">
+            <div style="font-size: 10px; color: #a5b4fc;">Quincena 2 (Dic)</div>
+            <div style="font-size: 14px; font-weight: 800; color: #34d399;">$3.600.000</div>
+          </button>
+          <button class="btn-action" onclick="promptAddIncome('Q1 Base (Día 1-5)', 3800000)">
+            <div style="font-size: 10px; color: var(--text-muted);">Quincena 1</div>
+            <div style="font-size: 14px; font-weight: 800; color: #34d399;">$3.800.000</div>
+          </button>
+          <button class="btn-action" onclick="promptAddIncome('Docencia Universidad', 1200000)">
+            <div style="font-size: 10px; color: var(--text-muted);">Docencia</div>
+            <div style="font-size: 14px; font-weight: 800; color: #34d399;">$1.200.000</div>
+          </button>
+          <button class="btn-action" style="background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4);" onclick="addCustomIncome()">
+            <div style="font-size: 10px; color: #a5b4fc;">Extra / Asesoría</div>
+            <div style="font-size: 14px; font-weight: 800; color: #c7d2fe;">+ Otro Valor</div>
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <span style="font-size: 10px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Historial Registrado</span>
+        <div id="income-history" style="margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- PANEL 4: MISIONES -->
+    <div id="view-milestones" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Misiones & Festivales</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Objetivos y compromisos concretos</p>
+      </div>
+      <div class="card" style="border-color: rgba(16,185,129,0.4); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="font-size: 24px;">✅</span>
+          <div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <b style="font-size: 13px;">Compromiso DIAN</b>
+              <span class="badge badge-paid">¡LISTO!</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">$1.000.000 cancelado sin costo financiero</div>
+          </div>
+        </div>
+        <span style="font-size: 13px; font-weight: 900; color: #34d399;">PAGADO</span>
+      </div>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <b style="font-size: 13px;">Festival Ritvales</b>
+            <div style="font-size: 11px; color: #fbbf24;">Abono pendiente antes del 1-Oct</div>
+          </div>
+          <span style="font-size: 13px; font-weight: 800; color: #fbbf24;">$500.000</span>
+        </div>
+        <div class="progress-bar">
+          <div style="width: 65%; background: #fbbf24; height: 100%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px;">
+          <span style="color: var(--text-muted);">Falta el último abono de 500k</span>
+          <a href="javascript:void(0)" onclick="completeRitvales()" style="color: #818cf8; font-weight: bold; text-decoration: none;">Marcar Pagado (+50 XP)</a>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <b style="font-size: 13px;">Paracaidismo</b>
+            <div style="font-size: 11px; color: var(--text-muted);">Objetivo: $1.5M para Octubre</div>
+          </div>
+          <span style="font-size: 13px; font-weight: 800; color: #a5b4fc;">$1.500.000</span>
+        </div>
+        <div class="progress-bar">
+          <div id="paracaidismo-bar" style="width: 15%; background: #6366f1; height: 100%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px;">
+          <span id="paracaidismo-text" style="color: var(--text-muted);">$225.000 acumulados</span>
+          <a href="javascript:void(0)" onclick="abonoParacaidismo()" style="color: #818cf8; font-weight: bold; text-decoration: none;">+ Abonar $150.000</a>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <b style="font-size: 13px;">Viaje Fin de Año</b>
+            <div style="font-size: 11px; color: var(--text-muted);">Diciembre 2026</div>
+          </div>
+          <span style="font-size: 13px; font-weight: 800; color: var(--text);">$2.500.000</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 5: FONDOS -->
+    <div id="view-savings" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Fondos & Reservas</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Cajas protegidas para tus prioridades</p>
+      </div>
+      <div class="card" style="border-color: rgba(16,185,129,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: bold; color: #34d399;">🛡️ Caja de Riesgo Intocable</span>
+          <span class="badge badge-paid">INTOCABLE</span>
+        </div>
+        <div style="font-size: 22px; font-weight: 900; margin-top: 6px;">$1.000.000</div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Reserva de seguridad blindada.</p>
+      </div>
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: bold; color: #cbd5e1;">🏍️ Cuota Moto (Q2 Mitad de Mes)</span>
+          <span style="font-size: 10px; color: #818cf8; font-weight: bold;">Prioridad 1</span>
+        </div>
+        <div style="font-size: 22px; font-weight: 900; margin-top: 6px;">$800.000</div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Sale de la segunda quincena inmediatamente sin desviarse.</p>
+      </div>
+      <div class="card" style="background: radial-gradient(circle at top right, rgba(99,102,241,0.2), var(--card)); border-color: rgba(99,102,241,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; font-weight: bold; color: #a5b4fc;">🏛️ Fondo Preventivo DIAN</span>
+          <button onclick="provisionarDIAN()" style="background: #6366f1; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer;">+ Provisionar</button>
+        </div>
+        <div id="dian-fund-val" style="font-size: 22px; font-weight: 900; margin-top: 6px;">$200.000</div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Aporte mensual programado para no volver a sufrir en declaraciones futuras.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN -->
+  <div class="tab-bar">
+    <button class="tab-item active" id="btn-pet" onclick="switchTab('pet')">
+      <span class="tab-icon">🦊</span>
+      <span>Mascota</span>
+    </button>
+    <button class="tab-item" id="btn-expenses" onclick="switchTab('expenses')">
+      <span class="tab-icon">🧾</span>
+      <span>Gastos</span>
+    </button>
+    <button class="tab-item" id="btn-income" onclick="switchTab('income')">
+      <span class="tab-icon">💵</span>
+      <span>Ingresos</span>
+    </button>
+    <button class="tab-item" id="btn-milestones" onclick="switchTab('milestones')">
+      <span class="tab-icon">🎯</span>
+      <span>Misiones</span>
+    </button>
+    <button class="tab-item" id="btn-savings" onclick="switchTab('savings')">
+      <span class="tab-icon">🛡️</span>
+      <span>Fondos</span>
+    </button>
+  </div>
+
+  <script>
+    let enteredPin = '';
+    function getStoredPin() {
+      return localStorage.getItem('finquest_pin') || '1234';
+    }
+
+    function pressKey(num) {
+      if (enteredPin.length < 4) {
+        enteredPin += num;
+        updateDots();
+        if (enteredPin.length === 4) setTimeout(verifyPin, 150);
+      }
+    }
+
+    function deleteKey() {
+      enteredPin = enteredPin.slice(0, -1);
+      updateDots();
+    }
+
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('dot-' + i);
+        if (i < enteredPin.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
+      }
+    }
+
+    function verifyPin() {
+      if (enteredPin === getStoredPin()) {
+        document.getElementById('lock-screen').style.display = 'none';
+        enteredPin = '';
+        updateDots();
+      } else {
+        alert('PIN incorrecto.');
+        enteredPin = '';
+        updateDots();
+      }
+    }
+
+    function lockApp() {
+      enteredPin = '';
+      updateDots();
+      document.getElementById('lock-screen').style.display = 'flex';
+    }
+
+    function changePinPrompt() {
+      const current = prompt('Ingresa tu PIN actual:');
+      if (current === getStoredPin()) {
+        const newPin = prompt('Nuevo PIN de 4 dígitos:');
+        if (newPin && newPin.length === 4 && !isNaN(newPin)) {
+          localStorage.setItem('finquest_pin', newPin);
+          showToast('PIN actualizado');
+        } else {
+          alert('El PIN debe tener 4 números.');
+        }
+      } else {
+        alert('PIN incorrecto.');
+      }
+    }
+
+    // Carga de datos persistentes en LocalStorage
+    function loadSavedIncomes() {
+      const saved = localStorage.getItem('finquest_incomes');
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function saveIncomesToStorage(incomes) {
+      localStorage.setItem('finquest_incomes', JSON.stringify(incomes));
+    }
+
+    const appState = {
+      xp: 45, level: 1, dianFund: 200000, paracaidismo: 225000,
+      expenses: [
+        { id: '1', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', cat: 'Transporte', paid: false },
+        { id: '2', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 de cada mes', cat: 'Fijo (sube a 2.6M en nov)', paid: true },
+        { id: '3', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', cat: 'Equipos', paid: false },
+        { id: '4', title: 'Gimnasio', amount: 250000, due: 'Día 1 del mes', cat: 'No Negociable', paid: true },
+        { id: '5', title: 'Perro (Comida/Cuidados)', amount: 400000, due: 'Recurrente', cat: 'No Negociable', paid: true },
+        { id: '6', title: 'Vida Personal & Salidas', amount: 800000, due: 'Quincenal', cat: 'No Negociable', paid: false },
+        { id: '7', title: 'Suscripciones Apps', amount: 392800, due: 'Cierre de mes', cat: 'Servicios', paid: true }
+      ],
+      incomes: loadSavedIncomes()
+    };
+
+    function renderExpenses() {
+      const container = document.getElementById('expenses-list');
+      container.innerHTML = '';
+      appState.expenses.forEach(exp => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.style.display = 'flex';
+        d.style.justifyContent = 'space-between';
+        d.style.alignItems = 'center';
+        d.style.opacity = exp.paid ? '0.75' : '1';
+        d.innerHTML = `
+          <div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <b style="font-size: 13px; text-decoration: ${exp.paid ? 'line-through' : 'none'};">${exp.title}</b>
+              <span class="badge ${exp.paid ? 'badge-paid' : 'badge-pending'}">${exp.paid ? 'PAGADO' : 'PENDIENTE'}</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">⏱️ ${exp.due} &bull; ${exp.cat}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 13px; font-weight: 800;">$${exp.amount.toLocaleString('es-CO')}</div>
+            <button class="btn-approve ${exp.paid ? 'btn-paid' : ''}" style="margin-top: 4px;" onclick="toggleExpense('${exp.id}')">
+              ${exp.paid ? 'Desmarcar' : 'Aprobar Pago'}
+            </button>
+          </div>
+        `;
+        container.appendChild(d);
+      });
+    }
+
+    function toggleExpense(id) {
+      const item = appState.expenses.find(e => e.id === id);
+      if (item) {
+        item.paid = !item.paid;
+        if (item.paid) gainXP(20, '¡Pago aprobado! +20 XP');
+        renderExpenses();
+      }
+    }
+
+    function renderIncomes() {
+      const container = document.getElementById('income-history');
+      container.innerHTML = '';
+      if (appState.incomes.length === 0) {
+        container.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); padding: 8px 0;">No hay ingresos registrados aún para este ciclo. Usa los botones de arriba para ingresar.</div>';
+        return;
+      }
+      appState.incomes.forEach((inc, index) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '8px 0';
+        row.style.fontSize = '12px';
+        row.style.borderBottom = '1px solid #1e293b';
+        row.innerHTML = `
+          <div><b>${inc.title}</b> <span style="font-size: 10px; color: var(--text-muted);">${inc.date}</span></div>
+          <div style="display: flex; align-items: center;">
+            <span style="color: #34d399; font-weight: bold;">+$${inc.amount.toLocaleString('es-CO')}</span>
+            <button class="btn-del" onclick="deleteIncome(${index})" title="Eliminar ingreso">🗑️</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function promptAddIncome(defaultTitle, defaultAmount) {
+      const inputVal = prompt(`Confirmar o editar monto para "${defaultTitle}" (en COP):`, defaultAmount);
+      if (inputVal && !isNaN(inputVal)) {
+        addIncomeRecord(defaultTitle, parseInt(inputVal));
+      }
+    }
+
+    function addCustomIncome() {
+      const title = prompt('Descripción del ingreso (ej. Honorarios, Extra, Prima):', 'Ingreso Extra');
+      if (title) {
+        const amount = prompt('Monto en COP:', '600000');
+        if (amount && !isNaN(amount)) {
+          addIncomeRecord(title, parseInt(amount));
+        }
+      }
+    }
+
+    function addIncomeRecord(title, amount) {
+      appState.incomes.unshift({ title, amount, date: 'Dic 2026' });
+      saveIncomesToStorage(appState.incomes);
+      gainXP(25, `Ingreso guardado: $${amount.toLocaleString('es-CO')} (+25 XP)`);
+      renderIncomes();
+    }
+
+    function deleteIncome(index) {
+      if (confirm(`¿Deseas eliminar "${appState.incomes[index].title}"?`)) {
+        appState.incomes.splice(index, 1);
+        saveIncomesToStorage(appState.incomes);
+        showToast('Ingreso eliminado del historial');
+        renderIncomes();
+      }
+    }
+
+    function provisionarDIAN() {
+      appState.dianFund += 200000;
+      document.getElementById('dian-fund-val').innerText = `$${appState.dianFund.toLocaleString('es-CO')}`;
+      gainXP(30, 'Abonados $200.000 al Fondo Preventivo DIAN (+30 XP)');
+    }
+
+    function abonoParacaidismo() {
+      appState.paracaidismo += 150000;
+      document.getElementById('paracaidismo-text').innerText = `$${appState.paracaidismo.toLocaleString('es-CO')} acumulados`;
+      const pct = Math.min(100, Math.round((appState.paracaidismo / 1500000) * 100));
+      document.getElementById('paracaidismo-bar').style.width = pct + '%';
+      gainXP(30, 'Abonados $150.000 a Paracaidismo (+30 XP)');
+    }
+
+    function completeRitvales() {
+      gainXP(50, '¡Ritvales liquidado por completo! +50 XP');
+    }
+
+    function gainXP(amount, msg) {
+      appState.xp += amount;
+      if (appState.xp >= 100) {
+        appState.level += 1;
+        appState.xp -= 100;
+        document.getElementById('level-badge').innerText = `Nv.${appState.level}`;
+        showToast(`🎉 ¡SUBISTE AL NIVEL ${appState.level}!`);
+      }
+      document.getElementById('xp-bar').style.width = `${appState.xp}%`;
+      document.getElementById('xp-label').innerText = `${appState.xp} / 100 XP`;
+      document.getElementById('stat-xp').innerText = `${appState.xp} XP`;
+      showToast(msg);
+    }
+
+    function equipItem(emoji) {
+      document.getElementById('pet-item').innerText = emoji;
+      showToast(`Accesorio ${emoji} equipado`);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      document.getElementById(`view-${tabId}`).style.display = 'block';
+      document.getElementById(`btn-${tabId}`).classList.add('active');
+    }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerText = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2400);
+    }
+
+    renderExpenses();
+    renderIncomes();
+  </script>
+</body>
+</html>
