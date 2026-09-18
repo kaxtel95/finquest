@@ -18,7 +18,7 @@
       --amber: #f59e0b;
       --rose: #f43f5e;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 95px; }
     .header { position: sticky; top: 0; z-index: 30; background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
     .avatar-badge { position: relative; width: 42px; height: 42px; border-radius: 14px; background: linear-gradient(135deg, #f59e0b, #6366f1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
@@ -35,6 +35,625 @@
     .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
     .badge-paid { background: rgba(16, 185, 129, 0.15); color: #34d399; }
     .badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .badge-unreceived { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+    .badge-skill { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; font-size: 9px; padding: 2px 6px; border-radius: 6px; }
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 27, 46, 0.98); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 40; }
+    .tab-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 10px; font-weight: 600; gap: 4px; }
+    .tab-item.active { color: #fbbf24; }
+    .tab-icon { font-size: 19px; }
+    .btn-approve { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .btn-paid { background: #334155; color: var(--text-muted); }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #6366f1; color: #fff; font-size: 12px; font-weight: 700; padding: 8px 16px; border-radius: 20px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    .btn-del { background: none; border: none; color: #ef4444; font-size: 14px; cursor: pointer; padding: 4px; margin-left: 6px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 60; display: flex; align-items: flex-end; justify-content: center; padding: 16px; }
+    .modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 24px; max-width: 420px; width: 100%; padding: 20px; }
+    input, select { width: 100%; background: #090d16; border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 13px; margin-top: 4px; margin-bottom: 12px; }
+    
+    /* Security Overlay */
+    #lock-screen { position: fixed; inset: 0; background: #090d16; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; user-select: none; }
+    .pin-display { display: flex; gap: 14px; margin: 24px 0; }
+    .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #6366f1; background: transparent; transition: all 0.2s ease; }
+    .pin-dot.filled { background: #6366f1; box-shadow: 0 0 12px #6366f1; }
+    .keypad { display: grid; grid-template-columns: repeat(3, 76px); gap: 16px; }
+    .keypad-btn { width: 76px; height: 76px; border-radius: 38px; background: #131b2e; border: 1px solid var(--border); color: #fff; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; user-select: none; }
+    .keypad-btn:active { background: #243252; transform: scale(0.96); }
+  </style>
+</head>
+<body>
+
+  <!-- PANTALLA DE BLOQUEO CON PIN -->
+  <div id="lock-screen" tabindex="0">
+    <div style="font-size: 44px; margin-bottom: 8px;">🛡️</div>
+    <h2 style="font-size: 18px; font-weight: bold;">FinQuest Seguro</h2>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Usa el mouse o el teclado de tu PC</p>
+    
+    <div class="pin-display">
+      <div class="pin-dot" id="dot-0"></div>
+      <div class="pin-dot" id="dot-1"></div>
+      <div class="pin-dot" id="dot-2"></div>
+      <div class="pin-dot" id="dot-3"></div>
+    </div>
+
+    <div class="keypad">
+      <button type="button" class="keypad-btn" onclick="pressKey('1')">1</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('2')">2</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('3')">3</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('4')">4</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('5')">5</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('6')">6</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('7')">7</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('8')">8</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('9')">9</button>
+      <button type="button" class="keypad-btn" onclick="lockApp()" style="font-size: 13px; color: #ef4444;">🔒 Bloq</button>
+      <button type="button" class="keypad-btn" onclick="pressKey('0')">0</button>
+      <button type="button" class="keypad-btn" onclick="deleteKey()" style="font-size: 18px;">⌫</button>
+    </div>
+    <p style="font-size: 11px; color: #64748b; margin-top: 24px;">PIN inicial: <b>1234</b></p>
+  </div>
+
+  <!-- ENCABEZADO -->
+  <div class="header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div class="avatar-badge">
+        🦊
+        <span id="level-badge" class="lvl-tag">Nv.1</span>
+      </div>
+      <div>
+        <div style="font-size: 13px; font-weight: bold;">FinQuest Companion</div>
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 10px;">
+          <span>🪙 <b id="stat-xp" style="color: #fbbf24;">0 XP</b></span>
+          <span>❤️ <b id="stat-hp" style="color: #34d399;">100% HP</b></span>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 6px;">
+      <button onclick="changePinPrompt()" style="background: #1e293b; color: #cbd5e1; border: 1px solid var(--border); padding: 5px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer;">🔑 PIN</button>
+      <button onclick="lockApp()" style="background: #1e293b; color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); padding: 5px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer;">🔒</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- PANEL 1: TAMAGOTCHI & HABILIDADES -->
+    <div id="view-pet" class="view-panel">
+      <div class="card pet-hero">
+        <div style="display: inline-block; font-size: 11px; background: rgba(30,41,59,0.8); padding: 4px 10px; border-radius: 8px; color: #34d399;">
+          Ánimo: <b>Guardián Activo ⚡</b>
+        </div>
+        <div class="pet-bounce" id="pet-avatar">🦊</div>
+        <div id="pet-item" style="font-size: 24px; margin-top: -24px; margin-bottom: 8px;">🎧</div>
+        <h2 style="font-size: 16px; font-weight: 900;">FinQuest Tamagotchi</h2>
+        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Paga a tiempo y aprueba gastos estratégicos para subir las habilidades de tu personaje.</p>
+        
+        <div class="progress-bar">
+          <div id="xp-bar" class="progress-fill" style="width: 0%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 6px;">
+          <span>Progreso: <b id="xp-label">0 / 100 XP</b></span>
+          <span>Siguiente: <b>Nv. 2</b></span>
+        </div>
+      </div>
+
+      <!-- MATRIZ DE ATRIBUTOS -->
+      <div class="card">
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">⚡ Atributos del Personaje</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+          <div style="background: #1e293b; padding: 10px; border-radius: 12px;">
+            <div style="font-size: 10px; color: #cbd5e1;">💪 Fuerza (Salud/Gym)</div>
+            <div id="attr-str" style="font-size: 14px; font-weight: 800; color: #f43f5e;">Nv. 1 (10 pts)</div>
+          </div>
+          <div style="background: #1e293b; padding: 10px; border-radius: 12px;">
+            <div style="font-size: 10px; color: #cbd5e1;">🧠 Intelecto (Estudio/Cursos)</div>
+            <div id="attr-int" style="font-size: 14px; font-weight: 800; color: #38bdf8;">Nv. 1 (5 pts)</div>
+          </div>
+          <div style="background: #1e293b; padding: 10px; border-radius: 12px;">
+            <div style="font-size: 10px; color: #cbd5e1;">🎯 Destreza (Moto/Equipos)</div>
+            <div id="attr-dex" style="font-size: 14px; font-weight: 800; color: #fbbf24;">Nv. 1 (15 pts)</div>
+          </div>
+          <div style="background: #1e293b; padding: 10px; border-radius: 12px;">
+            <div style="font-size: 10px; color: #cbd5e1;">✨ Espíritu (Perro/Hogar)</div>
+            <div id="attr-spi" style="font-size: 14px; font-weight: 800; color: #34d399;">Nv. 1 (10 pts)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARMARIO DE EXPERIENCIAS -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">👕 Armario Desbloqueable</span>
+          <span style="font-size: 10px; color: #818cf8;">Equipar</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center;">
+          <div onclick="equipItem('🎧')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🎧</div>
+            <div style="font-size: 9px; margin-top: 4px;">DJ Set</div>
+          </div>
+          <div onclick="equipItem('🪂')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🪂</div>
+            <div style="font-size: 9px; margin-top: 4px;">Paracaídas</div>
+          </div>
+          <div onclick="equipItem('🪩')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🪩</div>
+            <div style="font-size: 9px; margin-top: 4px;">Ritvales</div>
+          </div>
+          <div onclick="equipItem('🏍️')" style="background: #1e293b; padding: 10px 4px; border-radius: 12px; cursor: pointer;">
+            <div style="font-size: 22px;">🏍️</div>
+            <div style="font-size: 9px; margin-top: 4px;">Casco Moto</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: GASTOS -->
+    <div id="view-expenses" class="view-panel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div>
+          <h2 style="font-size: 16px; font-weight: bold;">Gastos Recurrentes</h2>
+          <p style="font-size: 11px; color: var(--text-muted);">Aprobar gastos fortalece las habilidades del Tamagotchi</p>
+        </div>
+        <button onclick="openModal('modal-add-expense')" style="background: #6366f1; color: white; border: none; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer;">
+          + Nuevo Gasto
+        </button>
+      </div>
+      <div id="expenses-list"></div>
+    </div>
+
+    <!-- PANEL 3: INGRESOS -->
+    <div id="view-income" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Gestión de Ingresos</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Empieza desde Q1 o añade ingresos inesperados y pendientes</p>
+      </div>
+
+      <div class="card">
+        <span style="font-size: 10px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Registrar Ingresos Habituales</span>
+        <div class="grid-btns">
+          <button class="btn-action" onclick="promptCustomIncome('Quincena 1 (Q1)')">
+            <div style="font-size: 10px; color: #a5b4fc;">Primeros 5 días</div>
+            <div style="font-size: 13px; font-weight: 800; color: #34d399;">+ Registrar Q1</div>
+          </button>
+          <button class="btn-action" onclick="promptCustomIncome('Quincena 2 (Q2)')">
+            <div style="font-size: 10px; color: #a5b4fc;">Mitad de mes</div>
+            <div style="font-size: 13px; font-weight: 800; color: #34d399;">+ Registrar Q2</div>
+          </button>
+          <button class="btn-action" onclick="promptCustomIncome('Docencia Universidad')">
+            <div style="font-size: 10px; color: #cbd5e1;">Cátedra / Clase</div>
+            <div style="font-size: 13px; font-weight: 800; color: #38bdf8;">+ Docencia</div>
+          </button>
+          <button class="btn-action" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3);" onclick="promptCustomIncome('Ingreso Inesperado / Extra')">
+            <div style="font-size: 10px; color: #34d399;">Premio / Imprevisto</div>
+            <div style="font-size: 13px; font-weight: 800; color: #34d399;">✨ Inesperado</div>
+          </button>
+        </div>
+
+        <button onclick="promptUnreceivedIncome()" style="width: 100%; margin-top: 10px; background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3); color: #fb7185; padding: 10px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: left;">
+          ⚠️ Registrar "Ingreso Esperado No Recibido" (Alerta de cobro)
+        </button>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 10px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Historial Registrado</span>
+          <button onclick="clearAllIncomes()" style="background: none; border: none; color: #f43f5e; font-size: 10px; font-weight: bold; cursor: pointer;">Limpiar Todo</button>
+        </div>
+        <div id="income-history" style="margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- PANEL 4: MISIONES -->
+    <div id="view-milestones" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Misiones & Festivales</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Objetivos y compromisos concretos</p>
+      </div>
+      <div class="card" style="border-color: rgba(16,185,129,0.4); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="font-size: 24px;">✅</span>
+          <div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <b style="font-size: 13px;">Compromiso DIAN</b>
+              <span class="badge badge-paid">¡LISTO!</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Cancelado sin costo financiero</div>
+          </div>
+        </div>
+        <span style="font-size: 13px; font-weight: 900; color: #34d399;">PAGADO</span>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <b style="font-size: 13px;">Festival Ritvales</b>
+            <div style="font-size: 11px; color: #fbbf24;">Abono pendiente antes del 1-Oct</div>
+          </div>
+          <span style="font-size: 13px; font-weight: 800; color: #fbbf24;">$500.000</span>
+        </div>
+        <div class="progress-bar">
+          <div style="width: 65%; background: #fbbf24; height: 100%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px;">
+          <span style="color: var(--text-muted);">Abono final de 500k</span>
+          <a href="javascript:void(0)" onclick="completeRitvales()" style="color: #818cf8; font-weight: bold; text-decoration: none;">Marcar Pagado (+50 XP)</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <b style="font-size: 13px;">Paracaidismo</b>
+            <div style="font-size: 11px; color: var(--text-muted);">Meta: $1.5M Octubre</div>
+          </div>
+          <span style="font-size: 13px; font-weight: 800; color: #a5b4fc;">$1.500.000</span>
+        </div>
+        <div class="progress-bar">
+          <div id="paracaidismo-bar" style="width: 15%; background: #6366f1; height: 100%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px;">
+          <span id="paracaidismo-text" style="color: var(--text-muted);">$225.000 acumulados</span>
+          <a href="javascript:void(0)" onclick="abonoParacaidismo()" style="color: #818cf8; font-weight: bold; text-decoration: none;">+ Abonar $150.000</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 5: ICLOUD & BANCOS -->
+    <div id="view-sync" class="view-panel" style="display: none;">
+      <div style="margin-bottom: 12px;">
+        <h2 style="font-size: 16px; font-weight: bold;">Sincronización iCloud & Bancos</h2>
+        <p style="font-size: 11px; color: var(--text-muted);">Automatiza la entrada de gastos desde tus correos</p>
+      </div>
+
+      <div class="card" style="border-color: rgba(99,102,241,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: bold; color: #a5b4fc;">Simulador de Notificación Bancaria</span>
+          <span class="badge" style="background: rgba(99,102,241,0.2); color: #c7d2fe;">iCloud Mail</span>
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Pega el texto de un correo/SMS de Bancolombia o BBVA:</p>
+        <textarea id="mock-email-input" style="width: 100%; height: 60px; background: #090d16; border: 1px solid var(--border); border-radius: 10px; color: #fff; padding: 8px; font-size: 11px;" placeholder="Bancolombia informa compra por $45.000 en Éxito Poblado..."></textarea>
+        <button onclick="parseEmailTransaction()" style="width: 100%; background: #6366f1; color: white; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 6px;">
+          ⚡ Procesar y Sumar XP
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+  <div class="tab-bar">
+    <button class="tab-item active" id="btn-pet" onclick="switchTab('pet')">
+      <span class="tab-icon">🦊</span>
+      <span>Mascota</span>
+    </button>
+    <button class="tab-item" id="btn-expenses" onclick="switchTab('expenses')">
+      <span class="tab-icon">🧾</span>
+      <span>Gastos</span>
+    </button>
+    <button class="tab-item" id="btn-income" onclick="switchTab('income')">
+      <span class="tab-icon">💵</span>
+      <span>Ingresos</span>
+    </button>
+    <button class="tab-item" id="btn-milestones" onclick="switchTab('milestones')">
+      <span class="tab-icon">🎯</span>
+      <span>Misiones</span>
+    </button>
+    <button class="tab-item" id="btn-sync" onclick="switchTab('sync')">
+      <span class="tab-icon">✉️</span>
+      <span>iCloud</span>
+    </button>
+  </div>
+
+  <!-- MODAL: AÑADIR GASTO -->
+  <div id="modal-add-expense" class="modal" style="display: none;">
+    <div class="modal-content">
+      <b style="font-size: 14px;">Añadir Gasto & Vincular Habilidad</b>
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Al pagarlo, aumentará este atributo de tu personaje.</p>
+      <div style="margin-top: 12px;">
+        <label style="font-size: 11px; color: #94a3b8;">Nombre del gasto</label>
+        <input type="text" id="new-exp-title" placeholder="Ej. Proteína Gym / Curso / Cuota">
+        
+        <label style="font-size: 11px; color: #94a3b8;">Monto en COP ($)</label>
+        <input type="number" id="new-exp-amount" placeholder="Ej. 150000">
+
+        <label style="font-size: 11px; color: #94a3b8;">Vencimiento / Periodo</label>
+        <input type="text" id="new-exp-due" placeholder="Ej. Quincena 1 / Día 10">
+
+        <label style="font-size: 11px; color: #94a3b8;">Habilidad que fortalece</label>
+        <select id="new-exp-skill">
+          <option value="STR">💪 Fuerza (Entrenamiento, Salud, Deporte)</option>
+          <option value="INT">🧠 Intelecto (Estudio, Software, Libros)</option>
+          <option value="DEX">🎯 Destreza (Equipos DJ, Moto, Herramientas)</option>
+          <option value="SPI">✨ Espíritu (Perro, Descanso, Bienestar)</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
+        <button onclick="closeModal('modal-add-expense')" style="flex: 1; background: #334155; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: bold; cursor: pointer;">Cancelar</button>
+        <button onclick="saveNewExpense()" style="flex: 1; background: #6366f1; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: bold; cursor: pointer;">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if (!localStorage.getItem('finquest_clean_v5')) {
+      localStorage.removeItem('finquest_incomes');
+      localStorage.setItem('finquest_clean_v5', 'true');
+    }
+
+    let enteredPin = '';
+    function getStoredPin() { return localStorage.getItem('finquest_pin') || '1234'; }
+
+    function pressKey(num) {
+      if (enteredPin.length < 4) {
+        enteredPin += num;
+        updateDots();
+        if (enteredPin.length === 4) {
+          setTimeout(verifyPin, 100);
+        }
+      }
+    }
+
+    function deleteKey() {
+      enteredPin = enteredPin.slice(0, -1);
+      updateDots();
+    }
+
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('dot-' + i);
+        if (dot) {
+          if (i < enteredPin.length) dot.classList.add('filled');
+          else dot.classList.remove('filled');
+        }
+      }
+    }
+
+    function verifyPin() {
+      if (enteredPin === getStoredPin()) {
+        document.getElementById('lock-screen').style.display = 'none';
+        enteredPin = '';
+        updateDots();
+      } else {
+        alert('PIN incorrecto.');
+        enteredPin = '';
+        updateDots();
+      }
+    }
+
+    function lockApp() {
+      enteredPin = '';
+      updateDots();
+      document.getElementById('lock-screen').style.display = 'flex';
+      document.getElementById('lock-screen').focus();
+    }
+
+    window.addEventListener('keydown', function(e) {
+      const lock = document.getElementById('lock-screen');
+      if (lock && lock.style.display !== 'none') {
+        if (e.key >= '0' && e.key <= '9') {
+          pressKey(e.key);
+        } else if (e.key === 'Backspace') {
+          deleteKey();
+        }
+      }
+    });
+
+    function changePinPrompt() {
+      const cur = prompt('PIN actual:');
+      if (cur === getStoredPin()) {
+        const n = prompt('Nuevo PIN (4 dígitos):');
+        if (n && n.length === 4 && !isNaN(n)) {
+          localStorage.setItem('finquest_pin', n);
+          showToast('PIN actualizado con éxito');
+        } else alert('Debe contener exactamente 4 números');
+      } else alert('PIN incorrecto');
+    }
+
+    const appState = {
+      xp: 0, level: 1,
+      skills: { STR: 10, INT: 5, DEX: 15, SPI: 10 },
+      paracaidismo: 225000,
+      expenses: [
+        { id: '1', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', skill: 'DEX', skillName: '🎯 Destreza', paid: false },
+        { id: '2', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 de cada mes', skill: 'SPI', skillName: '✨ Espíritu', paid: true },
+        { id: '3', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', skill: 'DEX', skillName: '🎯 Destreza', paid: false },
+        { id: '4', title: 'Gimnasio', amount: 250000, due: 'Día 1 del mes', skill: 'STR', skillName: '💪 Fuerza', paid: true },
+        { id: '5', title: 'Perro (Comida/Cuidados)', amount: 400000, due: 'Recurrente', skill: 'SPI', skillName: '✨ Espíritu', paid: true },
+        { id: '6', title: 'Vida Personal & Salidas', amount: 800000, due: 'Quincenal', skill: 'SPI', skillName: '✨ Espíritu', paid: false }
+      ],
+      incomes: JSON.parse(localStorage.getItem('finquest_incomes') || '[]')
+    };
+
+    function renderExpenses() {
+      const container = document.getElementById('expenses-list');
+      container.innerHTML = '';
+      appState.expenses.forEach(exp => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.style.display = 'flex';
+        d.style.justifyContent = 'space-between';
+        d.style.alignItems = 'center';
+        d.style.opacity = exp.paid ? '0.75' : '1';
+        d.innerHTML = `
+          <div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <b style="font-size: 13px; text-decoration: ${exp.paid ? 'line-through' : 'none'};">${exp.title}</b>
+              <span class="badge ${exp.paid ? 'badge-paid' : 'badge-pending'}">${exp.paid ? 'PAGADO' : 'PENDIENTE'}</span>
+              <span class="badge-skill">+${exp.skillName}</span>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">⏱️ ${exp.due}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 13px; font-weight: 800;">$${exp.amount.toLocaleString('es-CO')}</div>
+            <button class="btn-approve ${exp.paid ? 'btn-paid' : ''}" style="margin-top: 4px;" onclick="toggleExpense('${exp.id}')">
+              ${exp.paid ? 'Desmarcar' : 'Aprobar Pago'}
+            </button>
+          </div>
+        `;
+        container.appendChild(d);
+      });
+    }
+
+    function toggleExpense(id) {
+      const item = appState.expenses.find(e => e.id === id);
+      if (item) {
+        item.paid = !item.paid;
+        if (item.paid) {
+          appState.skills[item.skill] += 5;
+          updateSkillUI();
+          gainXP(25, `¡Pago aprobado! +25 XP y +5 en ${item.skillName}`);
+        }
+        renderExpenses();
+      }
+    }
+
+    function updateSkillUI() {
+      document.getElementById('attr-str').innerText = `Nv. ${Math.floor(appState.skills.STR / 10)} (${appState.skills.STR} pts)`;
+      document.getElementById('attr-int').innerText = `Nv. ${Math.floor(appState.skills.INT / 10)} (${appState.skills.INT} pts)`;
+      document.getElementById('attr-dex').innerText = `Nv. ${Math.floor(appState.skills.DEX / 10)} (${appState.skills.DEX} pts)`;
+      document.getElementById('attr-spi').innerText = `Nv. ${Math.floor(appState.skills.SPI / 10)} (${appState.skills.SPI} pts)`;
+    }
+
+    function renderIncomes() {
+      const container = document.getElementById('income-history');
+      container.innerHTML = '';
+      if (appState.incomes.length === 0) {
+        container.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); padding: 8px 0;">No hay ingresos registrados. Usa los botones superiores para registrar la Q1 o ingresos extras.</div>';
+        return;
+      }
+      appState.incomes.forEach((inc, index) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '8px 0';
+        row.style.fontSize = '12px';
+        row.style.borderBottom = '1px solid #1e293b';
+        row.innerHTML = `
+          <div>
+            <b>${inc.title}</b> 
+            <span class="badge ${inc.unreceived ? 'badge-unreceived' : 'badge-paid'}">${inc.unreceived ? 'NO RECIBIDO' : 'COBRADO'}</span>
+            <div style="font-size: 10px; color: var(--text-muted);">${inc.date}</div>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <span style="color: ${inc.unreceived ? '#fb7185' : '#34d399'}; font-weight: bold;">+$${inc.amount.toLocaleString('es-CO')}</span>
+            <button class="btn-del" onclick="deleteIncome(${index})" title="Eliminar">🗑️</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function promptCustomIncome(category) {
+      const amt = prompt(`Ingresa el monto para "${category}" en COP:`, '3800000');
+      if (amt && !isNaN(amt)) {
+        appState.incomes.unshift({ title: category, amount: parseInt(amt), date: 'Registrado', unreceived: false });
+        localStorage.setItem('finquest_incomes', JSON.stringify(appState.incomes));
+        gainXP(25, `Ingreso de $${parseInt(amt).toLocaleString('es-CO')} guardado (+25 XP)`);
+        renderIncomes();
+      }
+    }
+
+    function promptUnreceivedIncome() {
+      const concept = prompt('¿Qué ingreso esperabas que no ha llegado? (ej. Honorario Cliente X, Pago Cátedra retrasado):', 'Honorario pendiente');
+      if (concept) {
+        const amt = prompt('¿Monto esperado (COP)?', '1200000');
+        if (amt && !isNaN(amt)) {
+          appState.incomes.unshift({ title: concept, amount: parseInt(amt), date: '⚠️ PENDIENTE DE COBRO', unreceived: true });
+          localStorage.setItem('finquest_incomes', JSON.stringify(appState.incomes));
+          showToast('Alerta guardada: Ingreso pendiente de cobro');
+          renderIncomes();
+        }
+      }
+    }
+
+    function deleteIncome(index) {
+      appState.incomes.splice(index, 1);
+      localStorage.setItem('finquest_incomes', JSON.stringify(appState.incomes));
+      renderIncomes();
+      showToast('Registro eliminado');
+    }
+
+    function clearAllIncomes() {
+      if (confirm('¿Deseas vaciar todo el historial de ingresos?')) {
+        appState.incomes = [];
+        localStorage.setItem('finquest_incomes', JSON.stringify([]));
+        renderIncomes();
+        showToast('Historial limpiado');
+      }
+    }
+
+    function saveNewExpense() {
+      const title = document.getElementById('new-exp-title').value;
+      const amount = parseInt(document.getElementById('new-exp-amount').value);
+      const due = document.getElementById('new-exp-due').value || 'Por definir';
+      const skill = document.getElementById('new-exp-skill').value;
+      const skillNames = { STR: '💪 Fuerza', INT: '🧠 Intelecto', DEX: '🎯 Destreza', SPI: '✨ Espíritu' };
+      
+      if (title && !isNaN(amount)) {
+        appState.expenses.unshift({
+          id: Date.now().toString(),
+          title: title,
+          amount: amount,
+          due: due,
+          skill: skill,
+          skillName: skillNames[skill],
+          paid: false
+        });
+        renderExpenses();
+        closeModal('modal-add-expense');
+        showToast('Gasto creado y vinculado al atributo');
+      } else alert('Ingresa título y monto válidos');
+    }
+
+    function parseEmailTransaction() {
+      const text = document.getElementById('mock-email-input').value;
+      const match = text.match(/\$?\s?([0-9.,]+)/);
+      if (match) {
+        const amt = parseInt(match[1].replace(/\./g, '').replace(/,/g, ''));
+        gainXP(20, `Transacción detectada: $${amt.toLocaleString('es-CO')} (+20 XP)`);
+        document.getElementById('mock-email-input').value = '';
+      } else alert('No se detectó un monto en el texto.');
+    }
+
+    function gainXP(amount, msg) {
+      appState.xp += amount;
+      if (appState.xp >= 100) {
+        appState.level += 1;
+        appState.xp -= 100;
+        document.getElementById('level-badge').innerText = `Nv.${appState.level}`;
+        showToast(`🎉 ¡SUBISTE AL NIVEL ${appState.level}!`);
+      }
+      document.getElementById('xp-bar').style.width = `${appState.xp}%`;
+      document.getElementById('xp-label').innerText = `${appState.xp} / 100 XP`;
+      document.getElementById('stat-xp').innerText = `${appState.xp} XP`;
+      showToast(msg);
+    }
+
+    function equipItem(emoji) {
+      document.getElementById('pet-item').innerText = emoji;
+      showToast(`Accesorio ${emoji} equipado`);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      document.getElementById(`view-${tabId}`).style.display = 'block';
+      document.getElementById(`btn-${tabId}`).classList.add('active');
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerText = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2400);
+    }
+
+    renderExpenses();
+    renderIncomes();
+    updateSkillUI();
+  </script>
+</body>
+</html>    .badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
     .badge-unreceived { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
     .badge-skill { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; font-size: 9px; padding: 2px 6px; border-radius: 6px; }
     .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(19, 27, 46, 0.98); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 40; }
