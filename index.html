@@ -3,45 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinQuest RPG</title>
+  <title>FinQuest RPG Nea</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background-color: #070a12; color: #f1f5f9; min-height: 100vh; padding-bottom: 90px; }
+    body { background-color: #070a12; color: #f1f5f9; min-height: 100vh; padding-bottom: 95px; }
     
-    /* Header */
+    /* Top Header */
     .top-header { position: sticky; top: 0; z-index: 40; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #1e293b; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
     .user-pill { display: flex; align-items: center; gap: 10px; }
-    .avatar-icon { position: relative; width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .avatar-icon { position: relative; width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 22px; }
     .lvl-badge { position: absolute; bottom: -4px; right: -4px; background: #fbbf24; color: #000; font-size: 9px; font-weight: 900; padding: 1px 5px; border-radius: 6px; }
     
-    .main-wrap { max-width: 460px; margin: 0 auto; padding: 16px; }
+    .main-wrap { max-width: 480px; margin: 0 auto; padding: 16px; }
     .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 20px; padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
     
-    /* Pet Banner */
+    /* Pet Display */
     .pet-box { text-align: center; background: radial-gradient(circle at 50% 0%, #1e1b4b, #0f172a); border: 1px solid rgba(99, 102, 241, 0.35); }
-    .pet-anim { font-size: 64px; margin: 10px 0; display: inline-block; animation: petFloat 2.4s infinite ease-in-out; }
-    @keyframes petFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .pet-anim { font-size: 70px; margin: 10px 0; display: inline-block; animation: petFloat 2.4s infinite ease-in-out; }
+    @keyframes petFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     
     .bar-track { background: #020617; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 10px; border: 1px solid #1e293b; }
     .bar-fill { background: linear-gradient(90deg, #6366f1, #38bdf8); height: 100%; border-radius: 99px; transition: width 0.4s ease; }
     
-    /* Grid de Stats */
+    /* Selector de Personajes */
+    .char-select-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; text-align: center; }
+    .char-card { background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 8px 4px; cursor: pointer; transition: all 0.2s; }
+    .char-card.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+    
+    /* Matrix Stats */
     .stats-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .stat-chip { background: #020617; border: 1px solid #1e293b; border-radius: 12px; padding: 10px; }
     
-    /* Botones de acción */
+    /* Segmented Tabs (Recurrentes vs Diarios) */
+    .segmented-control { display: flex; background: #020617; border: 1px solid #1e293b; border-radius: 14px; padding: 3px; margin-bottom: 12px; }
+    .segment-btn { flex: 1; padding: 8px 0; background: none; border: none; color: #94a3b8; font-size: 11px; font-weight: 700; border-radius: 10px; cursor: pointer; }
+    .segment-btn.active { background: #1e293b; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    
+    /* Botones y Badges */
     .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .btn-quick { background: #020617; border: 1px solid #1e293b; border-radius: 14px; padding: 12px; text-align: left; color: #fff; cursor: pointer; }
     .btn-quick:hover { border-color: #6366f1; background: #0f172a; }
     .btn-action-main { background: #6366f1; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
-    .btn-del-item { background: none; border: none; color: #f43f5e; cursor: pointer; padding: 4px; font-size: 14px; }
+    .btn-punish { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fb7185; padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; text-align: left; margin-top: 8px; }
     
-    /* Tags de estado */
     .tag { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 99px; text-transform: uppercase; }
     .tag-paid { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
     .tag-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .tag-alert { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
-    .tag-skill { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; font-size: 9px; padding: 2px 6px; border-radius: 6px; }
+    .tag-punish { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
 
     /* Barra inferior */
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(16px); border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; }
@@ -49,7 +57,7 @@
     .nav-tab.active { color: #38bdf8; }
     .nav-icon { font-size: 18px; }
 
-    /* Modal Form */
+    /* Modals */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 80; display: none; align-items: flex-end; justify-content: center; padding: 16px; }
     .modal-sheet { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; max-width: 440px; width: 100%; padding: 20px; }
     input, select, textarea { width: 100%; background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 10px; color: #fff; font-size: 13px; margin: 4px 0 12px; outline: none; }
@@ -59,54 +67,76 @@
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
+  <!-- CABECERA -->
   <header class="top-header">
     <div class="user-pill">
-      <div class="avatar-icon">
-        🦊
+      <div class="avatar-icon" id="top-avatar">
+        🥟
         <span id="badge-level" class="lvl-badge">Nv.1</span>
       </div>
       <div>
-        <h1 style="font-size: 13px; font-weight: 800;">FinQuest Companion</h1>
+        <h1 style="font-size: 13px; font-weight: 800;" id="top-char-name">Empanada Nea</h1>
         <div style="font-size: 11px; color: #94a3b8; display: flex; gap: 10px;">
           <span>🪙 <b id="val-xp" style="color: #fbbf24;">0 XP</b></span>
-          <span>❤️ <b style="color: #34d399;">100% HP</b></span>
+          <span>❤️ <b id="val-hp" style="color: #34d399;">100% HP</b></span>
         </div>
       </div>
     </div>
-    <button onclick="toggleCleanData()" style="background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: 11px; padding: 5px 10px; border-radius: 8px; cursor: pointer;">
-      ⚙️ Reiniciar Todo
+    <button onclick="toggleCleanData()" style="background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: 10px; padding: 4px 8px; border-radius: 8px; cursor: pointer;">
+      ⚙️ Reiniciar
     </button>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <main class="main-wrap">
 
-    <!-- PESTAÑA 1: MASCOTA & RPG -->
+    <!-- PESTAÑA 1: MASCOTA & SELECTOR -->
     <div id="panel-pet" class="view-section">
       <div class="glass-card pet-box">
-        <span style="font-size: 10px; font-weight: 800; background: rgba(16,185,129,0.15); color: #34d399; padding: 3px 8px; border-radius: 99px;">
-          Ánimo: Guardián Activo ⚡
+        <span id="pet-status-tag" style="font-size: 10px; font-weight: 800; background: rgba(16,185,129,0.15); color: #34d399; padding: 3px 8px; border-radius: 99px;">
+          Estado: Firme & Activo ⚡
         </span>
         <div>
-          <div class="pet-anim" id="sprite-pet">🦊</div>
+          <div class="pet-anim" id="sprite-pet">🥟</div>
           <div id="sprite-item" style="font-size: 24px; margin-top: -20px; margin-bottom: 6px;">🎧</div>
         </div>
-        <h2 style="font-size: 17px; font-weight: 800;">Zen Master Financiero</h2>
-        <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Paga a tiempo y aprueba gastos para subir los atributos de tu avatar.</p>
+        <h2 style="font-size: 17px; font-weight: 800;" id="pet-title-name">Empanada Nea</h2>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Cuida tus gastos y tu tiempo para no quemar a tu compañero.</p>
 
         <div class="bar-track">
           <div id="bar-xp-fill" class="bar-fill" style="width: 0%;"></div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; margin-top: 5px;">
           <span>XP: <b id="txt-xp-ratio" style="color: #fff;">0 / 100</b></span>
-          <span>Siguiente: <b>Nv. 2</b></span>
+          <span>Siguiente Nivel</span>
         </div>
       </div>
 
-      <!-- Atributos del Avatar -->
+      <!-- SELECTOR DE PERSONAJE -->
       <div class="glass-card">
-        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">⚡ Atributos del Personaje</span>
+        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">🎮 Escoge tu Personaje</span>
+        <div class="char-select-grid">
+          <div class="char-card active" id="card-empanada" onclick="setAvatar('🥟', 'Empanada Nea', 'card-empanada')">
+            <div style="font-size: 24px;">🥟</div>
+            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Empanada</div>
+          </div>
+          <div class="char-card" id="card-cafe" onclick="setAvatar('☕', 'Tinto Nea', 'card-cafe')">
+            <div style="font-size: 24px;">☕</div>
+            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Tinto / Cold</div>
+          </div>
+          <div class="char-card" id="card-cono" onclick="setAvatar('🍦', 'Conito Cremoso', 'card-cono')">
+            <div style="font-size: 24px;">🍦</div>
+            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Conito</div>
+          </div>
+          <div class="char-card" id="card-zorro" onclick="setAvatar('🦊', 'Zorro FinTech', 'card-zorro')">
+            <div style="font-size: 24px;">🦊</div>
+            <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">Zorro</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATRIZ DE ATRIBUTOS -->
+      <div class="glass-card">
+        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">⚡ Atributos del Avatar</span>
         <div class="stats-2x2">
           <div class="stat-chip">
             <span style="font-size: 10px; color: #94a3b8;">💪 Fuerza (Salud/Gym)</span>
@@ -126,56 +156,45 @@
           </div>
         </div>
       </div>
-
-      <!-- Armario -->
-      <div class="glass-card">
-        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">👕 Armario de Experiencias</span>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; text-align: center;">
-          <div onclick="equipItem('🎧')" style="background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 8px; cursor: pointer;">
-            <div style="font-size: 20px;">🎧</div>
-            <div style="font-size: 9px; margin-top: 2px;">DJ Set</div>
-          </div>
-          <div onclick="equipItem('🪂')" style="background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 8px; cursor: pointer;">
-            <div style="font-size: 20px;">🪂</div>
-            <div style="font-size: 9px; margin-top: 2px;">Paracaídas</div>
-          </div>
-          <div onclick="equipItem('🪩')" style="background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 8px; cursor: pointer;">
-            <div style="font-size: 20px;">🪩</div>
-            <div style="font-size: 9px; margin-top: 2px;">Ritvales</div>
-          </div>
-          <div onclick="equipItem('🏍️')" style="background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 8px; cursor: pointer;">
-            <div style="font-size: 20px;">🏍️</div>
-            <div style="font-size: 9px; margin-top: 2px;">Casco Moto</div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- PESTAÑA 2: GASTOS -->
+    <!-- PESTAÑA 2: GASTOS (RECURRENTES VS DIARIOS + CASTIGOS) -->
     <div id="panel-expenses" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <div>
-          <h2 style="font-size: 16px; font-weight: 800;">Gastos Recurrentes</h2>
-          <p style="font-size: 11px; color: #94a3b8;">Aprobar gastos fortalece tu avatar</p>
+          <h2 style="font-size: 16px; font-weight: 800;">Control de Salidas</h2>
+          <p style="font-size: 11px; color: #94a3b8;">Diferencia tus fijos de tus gastos diarios</p>
         </div>
-        <button class="btn-action-main" onclick="openExpenseModal()">+ Nuevo Gasto</button>
+        <button class="btn-action-main" onclick="openExpenseModal()">+ Gasto</button>
       </div>
 
-      <div id="expenses-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      <!-- Segmented Control Recurrentes vs Diarios -->
+      <div class="segmented-control">
+        <button class="segment-btn active" id="btn-subtab-recurrent" onclick="switchExpenseSubtab('recurrent')">📅 Recurrentes (Fijos)</button>
+        <button class="segment-btn" id="btn-subtab-daily" onclick="switchExpenseSubtab('daily')">☕ Diarios & Hormiga</button>
+      </div>
+
+      <!-- Botón de Castigo Rápido -->
+      <button class="btn-punish" onclick="applyDirectPunishment()">
+        🚨 Sanción: Registrar Despilfarro / Procrastinación (-20% HP)
+      </button>
+
+      <!-- Lista de Gastos -->
+      <div id="expenses-container" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;"></div>
     </div>
 
     <!-- PESTAÑA 3: INGRESOS -->
     <div id="panel-income" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
         <h2 style="font-size: 16px; font-weight: 800;">Gestión de Ingresos</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Registra la quincena o añade ingresos adicionales</p>
+        <p style="font-size: 11px; color: #94a3b8;">Registra tus entradas o alertas de cobro</p>
       </div>
 
       <div class="glass-card">
         <span style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Valores Habituales</span>
         <div class="grid-btns">
           <button class="btn-quick" onclick="addIncomePrompt('Quincena 1 (Q1)', 3800000)">
-            <span style="font-size: 10px; color: #94a3b8;">Primeros 5 días</span>
+            <span style="font-size: 10px; color: #94a3b8;">Días 1-5</span>
             <div style="font-size: 14px; font-weight: 800; color: #34d399; margin-top: 2px;">+ Q1 Base</div>
           </button>
           <button class="btn-quick" onclick="addIncomePrompt('Quincena 2 (Q2)', 3600000)">
@@ -187,7 +206,7 @@
             <div style="font-size: 14px; font-weight: 800; color: #38bdf8; margin-top: 2px;">+ Docencia</div>
           </button>
           <button class="btn-quick" onclick="addIncomePrompt('Ingreso Inesperado / Extra', 500000)">
-            <span style="font-size: 10px; color: #94a3b8;">Imprevisto / Bono</span>
+            <span style="font-size: 10px; color: #94a3b8;">Bono / Extra</span>
             <div style="font-size: 14px; font-weight: 800; color: #fbbf24; margin-top: 2px;">✨ Inesperado</div>
           </button>
         </div>
@@ -206,72 +225,29 @@
       </div>
     </div>
 
-    <!-- PESTAÑA 4: MISIONES -->
+    <!-- PESTAÑA 4: MISIONES EDITABLES CON VALORES REALES -->
     <div id="panel-missions" class="view-section" style="display: none;">
-      <div style="margin-bottom: 12px;">
-        <h2 style="font-size: 16px; font-weight: 800;">Misiones & Festivales</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Objetivos y experiencias activas</p>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div>
+          <h2 style="font-size: 16px; font-weight: 800;">Misiones & Objetivos</h2>
+          <p style="font-size: 11px; color: #94a3b8;">Edita metas con tus valores reales</p>
+        </div>
+        <button class="btn-action-main" onclick="openNewMissionModal()">+ Misión</button>
       </div>
 
-      <div class="glass-card" style="border-color: rgba(16, 185, 129, 0.35); display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <span style="font-size: 24px;">✅</span>
-          <div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <b style="font-size: 13px;">Compromiso DIAN</b>
-              <span class="tag tag-paid">¡Listo!</span>
-            </div>
-            <p style="font-size: 11px; color: #94a3b8;">Cancelado sin costo financiero</p>
-          </div>
-        </div>
-        <b style="font-size: 13px; color: #34d399;">$1.000.000</b>
-      </div>
-
-      <div class="glass-card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <b style="font-size: 13px;">Festival Ritvales</b>
-            <p style="font-size: 11px; color: #fbbf24;">Abono final pendiente antes de Octubre</p>
-          </div>
-          <b style="font-size: 13px; color: #fbbf24;">$500.000</b>
-        </div>
-        <div class="bar-track">
-          <div style="width: 70%; height: 100%; background: #fbbf24;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px;">
-          <span style="color: #94a3b8;">Último abono de 500k</span>
-          <a href="javascript:void(0)" onclick="completeRitvales()" style="color: #38bdf8; font-weight: 800; text-decoration: none;">Marcar Pagado (+50 XP)</a>
-        </div>
-      </div>
-
-      <div class="glass-card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <b style="font-size: 13px;">Paracaidismo</b>
-            <p style="font-size: 11px; color: #94a3b8;">Meta: $1.5M para Octubre</p>
-          </div>
-          <b style="font-size: 13px; color: #38bdf8;">$1.500.000</b>
-        </div>
-        <div class="bar-track">
-          <div id="bar-para" style="width: 15%; height: 100%; background: #6366f1;"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px;">
-          <span id="txt-para" style="color: #94a3b8;">$225.000 acumulados</span>
-          <a href="javascript:void(0)" onclick="addParacaidismo()" style="color: #38bdf8; font-weight: 800; text-decoration: none;">+ Abonar $150k</a>
-        </div>
-      </div>
+      <div id="missions-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
     </div>
 
     <!-- PESTAÑA 5: ICLOUD & BANCOS -->
     <div id="panel-sync" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
         <h2 style="font-size: 16px; font-weight: 800;">Sincronización iCloud & Bancos</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Procesa notificaciones de Bancolombia/BBVA</p>
+        <p style="font-size: 11px; color: #94a3b8;">Procesa compras de Bancolombia/BBVA</p>
       </div>
 
       <div class="glass-card">
-        <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Simulador de Entrada Automática</span>
-        <textarea id="txt-sms" rows="2" style="margin-top: 8px;" placeholder="Pega aquí el texto: Bancolombia informa compra por $75.000..."></textarea>
+        <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Lector de Alertas Bancarias</span>
+        <textarea id="txt-sms" rows="2" style="margin-top: 8px;" placeholder="Pega aquí el texto: Bancolombia le informa compra por $75.000..."></textarea>
         <button class="btn-action-main" style="width: 100%; padding: 10px;" onclick="processSmsAlert()">⚡ Procesar y Sumar XP</button>
       </div>
     </div>
@@ -304,23 +280,30 @@
   <!-- MODAL: AÑADIR GASTO -->
   <div id="modal-expense-sheet" class="modal-backdrop">
     <div class="modal-sheet">
-      <b style="font-size: 14px;">Añadir Gasto & Atributo</b>
+      <b style="font-size: 14px;">Añadir Gasto</b>
       <div style="margin-top: 10px;">
+        <label style="font-size: 11px; color: #94a3b8;">Tipo de Gasto</label>
+        <select id="m-exp-type">
+          <option value="recurrent">📅 Gasto Recurrente (Arriendo, Moto, Consolas, Servicios)</option>
+          <option value="daily">☕ Gasto Diario / Hormiga (Café, Taxi, Almuerzo, Antojo)</option>
+          <option value="punish">🚨 Despilfarro / Mala Inversión (Aplica Castigo al HP)</option>
+        </select>
+
         <label style="font-size: 11px; color: #94a3b8;">Concepto</label>
-        <input type="text" id="m-title" placeholder="Ej. Gasolina Moto / Curso / Equipos">
+        <input type="text" id="m-title" placeholder="Ej. Cuota Moto / Tinto callejero / Salida">
 
         <label style="font-size: 11px; color: #94a3b8;">Monto ($ COP)</label>
-        <input type="number" id="m-amount" placeholder="Ej. 120000">
+        <input type="number" id="m-amount" placeholder="Ej. 800000">
 
-        <label style="font-size: 11px; color: #94a3b8;">Vencimiento</label>
-        <input type="text" id="m-due" placeholder="Ej. Mitad de mes (Q2)">
+        <label style="font-size: 11px; color: #94a3b8;">Vencimiento / Fecha</label>
+        <input type="text" id="m-due" placeholder="Ej. Mitad de mes (Q2) / Hoy">
 
-        <label style="font-size: 11px; color: #94a3b8;">Atributo que sube</label>
+        <label style="font-size: 11px; color: #94a3b8;">Atributo Relacionado</label>
         <select id="m-skill">
           <option value="STR">💪 Fuerza (Gym, Salud)</option>
-          <option value="INT">🧠 Intelecto (Estudio, Asesorías)</option>
-          <option value="DEX">🎯 Destreza (Moto, DJ, Producción)</option>
-          <option value="SPI">✨ Espíritu (Perro, Hogar, Descanso)</option>
+          <option value="INT">🧠 Intelecto (Estudio, Software, Libros)</option>
+          <option value="DEX">🎯 Destreza (Moto, Música DJ, Equipos)</option>
+          <option value="SPI">✨ Espíritu (Perro, Hogar, Bienestar)</option>
         </select>
       </div>
       <div style="display: flex; gap: 8px;">
@@ -330,25 +313,88 @@
     </div>
   </div>
 
+  <!-- MODAL: EDITAR / NUEVA MISIÓN -->
+  <div id="modal-mission-sheet" class="modal-backdrop">
+    <div class="modal-sheet">
+      <b style="font-size: 14px;" id="m-mission-modal-title">Editar Misión</b>
+      <input type="hidden" id="m-mission-id">
+      <div style="margin-top: 10px;">
+        <label style="font-size: 11px; color: #94a3b8;">Nombre de la Misión / Experiencia</label>
+        <input type="text" id="m-mission-title" placeholder="Ej. Festival Ritvales / Paracaidismo">
+
+        <label style="font-size: 11px; color: #94a3b8;">Meta Total ($ COP)</label>
+        <input type="number" id="m-mission-target" placeholder="Ej. 1500000">
+
+        <label style="font-size: 11px; color: #94a3b8;">Ahorrado / Abonado Real ($ COP)</label>
+        <input type="number" id="m-mission-current" placeholder="Ej. 500000">
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button onclick="closeMissionModal()" style="flex: 1; background: #1e293b; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer;">Cancelar</button>
+        <button onclick="saveMissionData()" class="btn-action-main" style="flex: 1; padding: 10px;">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Estado Central
     const app = {
-      xp: 0, level: 1, para: 225000,
+      xp: 0, hp: 100, level: 1,
+      currentSubtab: 'recurrent',
+      avatarEmoji: localStorage.getItem('fq_avatar_emoji') || '🥟',
+      avatarName: localStorage.getItem('fq_avatar_name') || 'Empanada Nea',
       skills: { STR: 10, INT: 5, DEX: 15, SPI: 10 },
-      expenses: [
-        { id: '1', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', skill: 'DEX', sName: 'Destreza', paid: false },
-        { id: '2', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 del mes', skill: 'SPI', sName: 'Espíritu', paid: true },
-        { id: '3', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', skill: 'DEX', sName: 'Destreza', paid: false },
-        { id: '4', title: 'Gimnasio', amount: 250000, due: 'Día 1 del mes', skill: 'STR', sName: 'Fuerza', paid: true },
-        { id: '5', title: 'Cuidado Perro', amount: 400000, due: 'Recurrente', skill: 'SPI', sName: 'Espíritu', paid: true },
-        { id: '6', title: 'Vida Personal & Salidas', amount: 800000, due: 'Quincenal', skill: 'SPI', sName: 'Espíritu', paid: false }
-      ],
-      incomes: JSON.parse(localStorage.getItem('fq_v11_incomes') || '[]')
+      expenses: JSON.parse(localStorage.getItem('fq_v12_expenses') || JSON.stringify([
+        { id: '1', type: 'recurrent', title: 'Cuota Moto', amount: 800000, due: 'Mitad de mes (Q2)', skill: 'DEX', sName: 'Destreza', paid: false },
+        { id: '2', type: 'recurrent', title: 'Arriendo Medellín', amount: 2450000, due: 'Día 5 del mes', skill: 'SPI', sName: 'Espíritu', paid: true },
+        { id: '3', type: 'recurrent', title: 'Cuota Consolas', amount: 500000, due: 'Día 10 del mes', skill: 'DEX', sName: 'Destreza', paid: false },
+        { id: '4', type: 'recurrent', title: 'Gimnasio', amount: 250000, due: 'Día 1 del mes', skill: 'STR', sName: 'Fuerza', paid: true },
+        { id: '5', type: 'recurrent', title: 'Cuidado Perro', amount: 400000, due: 'Recurrente', skill: 'SPI', sName: 'Espíritu', paid: true },
+        { id: '6', type: 'daily', title: 'Almuerzo / Café Diario', amount: 28000, due: 'Hoy', skill: 'STR', sName: 'Fuerza', paid: true },
+        { id: '7', type: 'daily', title: 'Gasolina Moto', amount: 35000, due: 'Semanal', skill: 'DEX', sName: 'Destreza', paid: false }
+      ])),
+      incomes: JSON.parse(localStorage.getItem('fq_v12_incomes') || '[]'),
+      missions: JSON.parse(localStorage.getItem('fq_v12_missions') || JSON.stringify([
+        { id: 'dian', title: 'Compromiso DIAN', target: 1000000, current: 1000000, note: 'Cancelado sin costo' },
+        { id: 'ritvales', title: 'Festival Ritvales', target: 1450000, current: 950000, note: 'Último abono de 500k pendiente' },
+        { id: 'paracaidas', title: 'Paracaidismo', target: 1500000, current: 225000, note: 'Meta Octubre' },
+        { id: 'viaje', title: 'Viaje Fin de Año', target: 2500000, current: 750000, note: 'Diciembre 2026' }
+      ]))
     };
+
+    function setAvatar(emoji, name, cardId) {
+      app.avatarEmoji = emoji;
+      app.avatarName = name;
+      localStorage.setItem('fq_avatar_emoji', emoji);
+      localStorage.setItem('fq_avatar_name', name);
+      
+      document.querySelectorAll('.char-card').forEach(c => c.classList.remove('active'));
+      document.getElementById(cardId).classList.add('active');
+      
+      document.getElementById('top-avatar').innerHTML = `${emoji} <span id="badge-level" class="lvl-badge">Nv.${app.level}</span>`;
+      document.getElementById('top-char-name').innerText = name;
+      document.getElementById('sprite-pet').innerText = emoji;
+      document.getElementById('pet-title-name').innerText = name;
+      showToast(`¡Compañero cambiado a ${name}!`);
+    }
+
+    function switchExpenseSubtab(tab) {
+      app.currentSubtab = tab;
+      document.getElementById('btn-subtab-recurrent').classList.toggle('active', tab === 'recurrent');
+      document.getElementById('btn-subtab-daily').classList.toggle('active', tab === 'daily');
+      renderExpenses();
+    }
 
     function renderExpenses() {
       const box = document.getElementById('expenses-container');
       box.innerHTML = '';
-      app.expenses.forEach(e => {
+      const filtered = app.expenses.filter(e => e.type === app.currentSubtab);
+      
+      if (filtered.length === 0) {
+        box.innerHTML = `<p style="font-size: 11px; color: #94a3b8; text-align: center; padding: 12px 0;">No hay gastos ${app.currentSubtab === 'recurrent' ? 'recurrentes' : 'diarios'} registrados.</p>`;
+        return;
+      }
+
+      filtered.forEach(e => {
         const d = document.createElement('div');
         d.className = 'glass-card';
         d.style.marginBottom = '0px';
@@ -383,25 +429,121 @@
         it.paid = !it.paid;
         if (it.paid) {
           app.skills[it.skill] += 5;
-          gainXP(25, `¡Pago aprobado! +25 XP y +5 en ${it.sName}`);
+          gainXP(25, `¡Aprobado! +25 XP y +5 en ${it.sName}`);
           updateSkills();
         }
+        localStorage.setItem('fq_v12_expenses', JSON.stringify(app.expenses));
         renderExpenses();
       }
     }
 
-    function updateSkills() {
-      document.getElementById('chip-str').innerText = `Nv. ${Math.floor(app.skills.STR/10)} (${app.skills.STR} pts)`;
-      document.getElementById('chip-int').innerText = `Nv. ${Math.floor(app.skills.INT/10)} (${app.skills.INT} pts)`;
-      document.getElementById('chip-dex').innerText = `Nv. ${Math.floor(app.skills.DEX/10)} (${app.skills.DEX} pts)`;
-      document.getElementById('chip-spi').innerText = `Nv. ${Math.floor(app.skills.SPI/10)} (${app.skills.SPI} pts)`;
+    function applyDirectPunishment() {
+      const motivo = prompt('¿En qué desperdiciaste tiempo o dinero? (ej: Compras impulsivas, Procrastinar toda la tarde, Domicilio innecesario):', 'Gasto impulsivo');
+      if (motivo) {
+        app.hp = Math.max(0, app.hp - 20);
+        document.getElementById('val-hp').innerText = `${app.hp}% HP`;
+        if (app.hp < 40) {
+          document.getElementById('val-hp').style.color = '#f43f5e';
+          document.getElementById('pet-status-tag').innerText = 'Estado: Herido y Agotado 🩹';
+          document.getElementById('pet-status-tag').style.color = '#f43f5e';
+        }
+        showToast(`🚨 Sanción aplicada por "${motivo}": -20% HP para tu avatar`);
+      }
+    }
+
+    function renderMissions() {
+      const box = document.getElementById('missions-container');
+      box.innerHTML = '';
+      app.missions.forEach(m => {
+        const pct = Math.min(100, Math.round((m.current / m.target) * 100));
+        const isDone = m.current >= m.target;
+        const div = document.createElement('div');
+        div.className = 'glass-card';
+        div.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <b style="font-size: 13px;">${m.title}</b>
+                <span class="tag ${isDone ? 'tag-paid' : 'tag-pending'}">${isDone ? 'COMPLETADO' : pct + '%'}</span>
+              </div>
+              <p style="font-size: 11px; color: #94a3b8; margin-top: 2px;">$${m.current.toLocaleString('es-CO')} de $${m.target.toLocaleString('es-CO')}</p>
+            </div>
+            <div style="display: flex; gap: 4px;">
+              <button onclick="openEditMission('${m.id}')" style="background: #1e293b; color: #38bdf8; border: 1px solid #334155; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer;">✏️ Editar</button>
+              <button onclick="addFundToMission('${m.id}')" style="background: #6366f1; color: white; border: none; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer;">+ Abonar</button>
+            </div>
+          </div>
+          <div class="bar-track" style="margin-top: 8px;">
+            <div style="width: ${pct}%; height: 100%; background: ${isDone ? '#10b981' : '#6366f1'}; border-radius: 99px;"></div>
+          </div>
+        `;
+        box.appendChild(div);
+      });
+    }
+
+    function openEditMission(id) {
+      const m = app.missions.find(x => x.id === id);
+      if (m) {
+        document.getElementById('m-mission-modal-title').innerText = 'Editar Misión';
+        document.getElementById('m-mission-id').value = m.id;
+        document.getElementById('m-mission-title').value = m.title;
+        document.getElementById('m-mission-target').value = m.target;
+        document.getElementById('m-mission-current').value = m.current;
+        document.getElementById('modal-mission-sheet').style.display = 'flex';
+      }
+    }
+
+    function openNewMissionModal() {
+      document.getElementById('m-mission-modal-title').innerText = 'Nueva Misión';
+      document.getElementById('m-mission-id').value = '';
+      document.getElementById('m-mission-title').value = '';
+      document.getElementById('m-mission-target').value = '';
+      document.getElementById('m-mission-current').value = '0';
+      document.getElementById('modal-mission-sheet').style.display = 'flex';
+    }
+
+    function closeMissionModal() {
+      document.getElementById('modal-mission-sheet').style.display = 'none';
+    }
+
+    function saveMissionData() {
+      const id = document.getElementById('m-mission-id').value;
+      const title = document.getElementById('m-mission-title').value;
+      const target = parseInt(document.getElementById('m-mission-target').value);
+      const current = parseInt(document.getElementById('m-mission-current').value) || 0;
+
+      if (title && !isNaN(target)) {
+        if (id) {
+          const m = app.missions.find(x => x.id === id);
+          if (m) { m.title = title; m.target = target; m.current = current; }
+        } else {
+          app.missions.push({ id: Date.now().toString(), title, target, current });
+        }
+        localStorage.setItem('fq_v12_missions', JSON.stringify(app.missions));
+        renderMissions();
+        closeMissionModal();
+        showToast('Misión guardada con valores reales');
+      } else alert('Ingresa un título y meta válidos');
+    }
+
+    function addFundToMission(id) {
+      const m = app.missions.find(x => x.id === id);
+      if (m) {
+        const val = prompt(`¿Cuánto deseas abonar a "${m.title}" ($ COP)?:`, '150000');
+        if (val && !isNaN(val)) {
+          m.current += parseInt(val);
+          localStorage.setItem('fq_v12_missions', JSON.stringify(app.missions));
+          gainXP(30, `Abonados $${parseInt(val).toLocaleString('es-CO')} a ${m.title} (+30 XP)`);
+          renderMissions();
+        }
+      }
     }
 
     function renderIncomes() {
       const box = document.getElementById('income-list-view');
       box.innerHTML = '';
       if (app.incomes.length === 0) {
-        box.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 4px 0;">No hay ingresos registrados aún. Usa los botones superiores.</p>';
+        box.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 4px 0;">No hay ingresos registrados aún.</p>';
         return;
       }
       app.incomes.forEach((inc, idx) => {
@@ -420,7 +562,7 @@
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
             <b style="color: ${inc.alert ? '#fb7185' : '#34d399'};">+$${inc.amount.toLocaleString('es-CO')}</b>
-            <button class="btn-del-item" onclick="deleteIncome(${idx})">🗑️</button>
+            <button onclick="deleteIncome(${idx})" style="background:none; border:none; color:#f43f5e; cursor:pointer;">🗑️</button>
           </div>
         `;
         box.appendChild(row);
@@ -431,7 +573,7 @@
       const val = prompt(`Monto a ingresar para ${title} ($ COP):`, defAmt);
       if (val && !isNaN(val)) {
         app.incomes.unshift({ title, amount: parseInt(val), date: 'Registrado', alert: false });
-        localStorage.setItem('fq_v11_incomes', JSON.stringify(app.incomes));
+        localStorage.setItem('fq_v12_incomes', JSON.stringify(app.incomes));
         gainXP(25, `+$${parseInt(val).toLocaleString('es-CO')} ingresados (+25 XP)`);
         renderIncomes();
       }
@@ -443,7 +585,7 @@
         const val = prompt('¿Por qué monto ($ COP)?:', '1200000');
         if (val && !isNaN(val)) {
           app.incomes.unshift({ title, amount: parseInt(val), date: '⚠️ PENDIENTE', alert: true });
-          localStorage.setItem('fq_v11_incomes', JSON.stringify(app.incomes));
+          localStorage.setItem('fq_v12_incomes', JSON.stringify(app.incomes));
           showToast('Alerta de cobro agregada');
           renderIncomes();
         }
@@ -452,7 +594,7 @@
 
     function deleteIncome(idx) {
       app.incomes.splice(idx, 1);
-      localStorage.setItem('fq_v11_incomes', JSON.stringify(app.incomes));
+      localStorage.setItem('fq_v12_incomes', JSON.stringify(app.incomes));
       renderIncomes();
       showToast('Registro eliminado');
     }
@@ -460,7 +602,7 @@
     function clearAllIncomes() {
       if (confirm('¿Vaciar todo el historial de ingresos?')) {
         app.incomes = [];
-        localStorage.setItem('fq_v11_incomes', JSON.stringify([]));
+        localStorage.setItem('fq_v12_incomes', JSON.stringify([]));
         renderIncomes();
         showToast('Historial limpiado');
       }
@@ -470,18 +612,26 @@
     function closeExpenseModal() { document.getElementById('modal-expense-sheet').style.display = 'none'; }
 
     function confirmNewExpense() {
+      const type = document.getElementById('m-exp-type').value;
       const title = document.getElementById('m-title').value;
       const amount = parseInt(document.getElementById('m-amount').value);
-      const due = document.getElementById('m-due').value || 'Quincenal';
+      const due = document.getElementById('m-due').value || 'Hoy';
       const skill = document.getElementById('m-skill').value;
       const mapNames = { STR: 'Fuerza', INT: 'Intelecto', DEX: 'Destreza', SPI: 'Espíritu' };
 
       if (title && !isNaN(amount)) {
-        app.expenses.unshift({ id: Date.now().toString(), title, amount, due, skill, sName: mapNames[skill], paid: false });
+        if (type === 'punish') {
+          app.hp = Math.max(0, app.hp - 15);
+          document.getElementById('val-hp').innerText = `${app.hp}% HP`;
+          showToast(`⚠️ Despilfarro registrado: -15% HP para tu avatar`);
+        } else {
+          app.expenses.unshift({ id: Date.now().toString(), type, title, amount, due, skill, sName: mapNames[skill], paid: false });
+          localStorage.setItem('fq_v12_expenses', JSON.stringify(app.expenses));
+          showToast('Gasto agregado a la lista');
+        }
         renderExpenses();
         closeExpenseModal();
-        showToast('Gasto agregado a la lista');
-      } else alert('Ingresa un título y monto válidos');
+      } else alert('Ingresa título y monto válidos');
     }
 
     function processSmsAlert() {
@@ -494,21 +644,11 @@
       } else alert('No se detectó un monto en el texto.');
     }
 
-    function completeRitvales() {
-      gainXP(50, '¡Ritvales liquidado! +50 XP');
-    }
-
-    function addParacaidismo() {
-      app.para += 150000;
-      document.getElementById('txt-para').innerText = `$${app.para.toLocaleString('es-CO')} acumulados`;
-      const p = Math.min(100, Math.round((app.para / 1500000) * 100));
-      document.getElementById('bar-para').style.width = p + '%';
-      gainXP(30, 'Abono registrado a Paracaidismo (+30 XP)');
-    }
-
-    function equipItem(emoji) {
-      document.getElementById('sprite-item').innerText = emoji;
-      showToast(`Accesorio ${emoji} equipado`);
+    function updateSkills() {
+      document.getElementById('chip-str').innerText = `Nv. ${Math.floor(app.skills.STR/10)} (${app.skills.STR} pts)`;
+      document.getElementById('chip-int').innerText = `Nv. ${Math.floor(app.skills.INT/10)} (${app.skills.INT} pts)`;
+      document.getElementById('chip-dex').innerText = `Nv. ${Math.floor(app.skills.DEX/10)} (${app.skills.DEX} pts)`;
+      document.getElementById('chip-spi').innerText = `Nv. ${Math.floor(app.skills.SPI/10)} (${app.skills.SPI} pts)`;
     }
 
     function gainXP(amount, msg) {
@@ -533,7 +673,7 @@
     }
 
     function toggleCleanData() {
-      if (confirm('¿Quieres reiniciar todas las estadísticas y gastos a su estado inicial?')) {
+      if (confirm('¿Quieres reiniciar todas las estadísticas y datos?')) {
         localStorage.clear();
         location.reload();
       }
@@ -547,8 +687,11 @@
       setTimeout(() => t.remove(), 2200);
     }
 
+    // Inicializar
+    setAvatar(app.avatarEmoji, app.avatarName, app.avatarEmoji === '🥟' ? 'card-empanada' : (app.avatarEmoji === '☕' ? 'card-cafe' : (app.avatarEmoji === '🍦' ? 'card-cono' : 'card-zorro')));
     renderExpenses();
     renderIncomes();
+    renderMissions();
     updateSkills();
   </script>
 </body>
