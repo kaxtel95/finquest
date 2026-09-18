@@ -3,19 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FinQuest Pro - RPG</title>
+  <title>FinQuest Nea - Medellín Edition</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: #070a13; color: #f8fafc; min-height: 100vh; padding-bottom: 100px; }
     
-    /* Top Header */
+    /* Header */
     .top-header { position: sticky; top: 0; z-index: 50; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid #1e293b; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
     .user-pill { display: flex; align-items: center; gap: 12px; }
-    .avatar-icon { position: relative; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #a855f7); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
+    .avatar-icon { position: relative; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #6366f1, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 14px rgba(99,102,241,0.3); }
     .lvl-badge { position: absolute; bottom: -4px; right: -4px; background: #fbbf24; color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 8px; border: 2px solid #070a13; }
     
     .main-wrap { max-width: 480px; margin: 0 auto; padding: 16px; }
     .glass-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 22px; padding: 18px; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    
+    /* Login Modal Parchado */
+    #auth-screen { position: fixed; inset: 0; background: #070a13; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; text-align: center; }
+    .auth-card { background: radial-gradient(circle at 50% 0%, #1e1b4b, #0f172a); border: 1px solid rgba(99, 102, 241, 0.45); border-radius: 28px; padding: 28px 22px; max-width: 380px; width: 100%; box-shadow: 0 12px 36px rgba(0,0,0,0.6); }
+    .pin-input { width: 180px; font-size: 28px; letter-spacing: 12px; text-align: center; background: #070a13; border: 2px solid #6366f1; border-radius: 16px; padding: 10px; color: #fff; margin: 18px auto; outline: none; display: block; }
     
     /* AI Coach Card */
     .ia-coach-card { background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.25), #0f172a); border: 1px solid rgba(99, 102, 241, 0.45); border-radius: 22px; padding: 18px; margin-bottom: 16px; }
@@ -30,7 +35,7 @@
     .bar-track { background: #070a13; height: 10px; border-radius: 99px; overflow: hidden; margin-top: 10px; border: 1px solid #1e293b; }
     .bar-fill { background: linear-gradient(90deg, #6366f1, #38bdf8); height: 100%; border-radius: 99px; transition: width 0.4s ease; }
     
-    /* Selectores y Botones Grandes */
+    /* Selectores y Botones */
     .char-select-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
     .char-card { background: #070a13; border: 1px solid #1e293b; border-radius: 14px; padding: 10px 4px; cursor: pointer; text-align: center; transition: all 0.2s; }
     .char-card.active { border-color: #fbbf24; background: rgba(251, 191, 36, 0.12); transform: scale(1.03); }
@@ -43,8 +48,8 @@
     .btn-quick:active { border-color: #6366f1; transform: scale(0.98); }
     .btn-quick b { display: block; font-size: 15px; margin-top: 4px; color: #34d399; }
     
-    .btn-action-main { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; padding: 10px 16px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; }
-    .btn-action-sm { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+    .btn-action-main { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; padding: 12px 18px; border-radius: 14px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(99,102,241,0.35); }
+    .btn-action-sm { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
     
     .segmented-control { display: flex; background: #070a13; border: 1px solid #1e293b; border-radius: 14px; padding: 3px; margin-bottom: 14px; }
     .segment-btn { flex: 1; padding: 10px 0; background: none; border: none; color: #94a3b8; font-size: 12px; font-weight: 800; border-radius: 10px; cursor: pointer; }
@@ -64,16 +69,37 @@
     .nav-tab.active { color: #38bdf8; }
     .nav-icon { font-size: 20px; }
 
-    /* Modal Form */
+    /* Modales */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 80; display: none; align-items: flex-end; justify-content: center; padding: 16px; }
     .modal-sheet { background: #0f172a; border: 1px solid #1e293b; border-radius: 26px; max-width: 440px; width: 100%; padding: 22px; }
     input, select { width: 100%; background: #070a13; border: 1px solid #1e293b; border-radius: 12px; padding: 12px; color: #fff; font-size: 13px; margin: 6px 0 14px; outline: none; }
     input:focus, select:focus { border-color: #6366f1; }
     
-    .app-toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; font-size: 12px; font-weight: 800; padding: 10px 20px; border-radius: 20px; z-index: 100; box-shadow: 0 4px 16px rgba(99,102,241,0.5); }
+    .app-toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; font-size: 12px; font-weight: 800; padding: 10px 20px; border-radius: 20px; z-index: 1000; box-shadow: 0 4px 16px rgba(99,102,241,0.5); }
   </style>
 </head>
 <body>
+
+  <!-- PANTALLA DE ACCESO PARCHADA (MEDELLÍN) -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div style="font-size: 48px; margin-bottom: 8px;">🥟⚡</div>
+      <h2 style="font-size: 22px; font-weight: 900; color: #fff;">¡Bienvenido al Parche!</h2>
+      <p style="font-size: 12px; color: #94a3b8; margin-top: 4px; line-height: 1.4;">
+        Aquí se cuida el billete con berraquera y sin regalarle un peso a nadie.
+      </p>
+      
+      <input type="password" id="input-pin" class="pin-input" maxlength="4" placeholder="••••" inputmode="numeric" autofocus oninput="checkInputPin(this.value)">
+
+      <button class="btn-action-main" style="width: 100%;" onclick="submitPin()">
+        🚀 Entrar a Controlar la Vuelta
+      </button>
+
+      <button onclick="bypassUnlock()" style="margin-top: 16px; background: none; border: none; color: #a5b4fc; font-size: 11px; font-weight: bold; cursor: pointer; text-decoration: underline;">
+        Entrar de una (Todo bien, mijo)
+      </button>
+    </div>
+  </div>
 
   <!-- CABECERA -->
   <header class="top-header">
@@ -91,21 +117,21 @@
       </div>
     </div>
     <div style="display: flex; gap: 6px;">
-      <button onclick="showBackupPrompt()" class="btn-action-sm">💾 Respaldo</button>
+      <button onclick="lockApp()" class="btn-action-sm">🔒 Bloquear</button>
       <button onclick="resetDataPrompt()" class="btn-action-sm" style="color: #f43f5e;">⚙️ Reset</button>
     </div>
   </header>
 
   <main class="main-wrap">
 
-    <!-- PESTAÑA 1: MASCOTA & ANÁLISIS IA COMPLETO -->
+    <!-- PESTAÑA 1: MASCOTA & COACH -->
     <div id="panel-pet" class="view-section">
       
       <!-- DASHBOARD ANÁLISIS FINANCIERO IA -->
       <div class="ia-coach-card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 11px; font-weight: 900; color: #a5b4fc; text-transform: uppercase;">🤖 Diagnóstico IA Financiero</span>
-          <span id="ia-alert-badge" class="tag tag-paid">Saludable</span>
+          <span style="font-size: 11px; font-weight: 900; color: #a5b4fc; text-transform: uppercase;">🤖 Coach Financiero Nea</span>
+          <span id="ia-alert-badge" class="tag tag-paid">Firme</span>
         </div>
         
         <div class="kpi-grid">
@@ -124,14 +150,14 @@
         </div>
 
         <p id="ia-advice-text" style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">
-          Cargando análisis de quincena...
+          Cargando análisis de la quincena...
         </p>
       </div>
 
       <!-- PET BANNER -->
       <div class="glass-card pet-box">
         <span id="pet-status-tag" style="font-size: 10px; font-weight: 900; background: rgba(16,185,129,0.15); color: #34d399; padding: 4px 10px; border-radius: 99px;">
-          Estado: Firme & Activo ⚡
+          Estado: Coronando el Mes ⚡
         </span>
         <div>
           <div class="pet-anim" id="sprite-pet">🥟</div>
@@ -171,9 +197,9 @@
         </div>
       </div>
 
-      <!-- MATRIZ DE ATRIBUTOS (HABILIDADES) -->
+      <!-- MATRIZ DE ATRIBUTOS -->
       <div class="glass-card">
-        <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">⚡ Atributos del Avatar</span>
+        <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">⚡ Habilidades del Personaje</span>
         <div class="stats-matrix">
           <div class="stat-chip">
             <span style="font-size: 11px; color: #94a3b8;">💪 Fuerza (Salud/Gym)</span>
@@ -218,7 +244,7 @@
       </div>
     </div>
 
-    <!-- PESTAÑA 2: GASTOS (ORDENADOS: PENDIENTES PRIMERO, PAGADOS AL FINAL) -->
+    <!-- PESTAÑA 2: GASTOS -->
     <div id="panel-expenses" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <div>
@@ -233,20 +259,18 @@
         <button class="segment-btn" id="btn-subtab-daily" onclick="switchExpenseSubtab('daily')">☕ Diarios & Hormiga</button>
       </div>
 
-      <!-- SECCIÓN 1: PENDIENTES -->
       <span style="font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase;">⚠️ Pendientes de Pago</span>
       <div id="expenses-pending-box" style="display: flex; flex-direction: column; gap: 8px; margin: 8px 0 20px;"></div>
 
-      <!-- SECCIÓN 2: PAGADOS -->
-      <span style="font-size: 11px; font-weight: 900; color: #34d399; text-transform: uppercase;">✅ Aprobados / Pagados del Mes</span>
+      <span style="font-size: 11px; font-weight: 900; color: #34d399; text-transform: uppercase;">✅ Aprobados del Mes</span>
       <div id="expenses-paid-box" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;"></div>
     </div>
 
-    <!-- PESTAÑA 3: INGRESOS COMPLETOS CON TODAS LAS CATEGORÍAS -->
+    <!-- PESTAÑA 3: INGRESOS -->
     <div id="panel-income" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
         <h2 style="font-size: 16px; font-weight: 800;">Gestión de Ingresos</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Registra tus entradas o alertas de cobro</p>
+        <p style="font-size: 11px; color: #94a3b8;">Registra tus entradas o cobros pendientes</p>
       </div>
 
       <div class="glass-card">
@@ -278,13 +302,13 @@
       <div class="glass-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Historial Registrado</span>
-          <button onclick="clearAllIncomes()" style="background: none; border: none; color: #f43f5e; font-size: 11px; font-weight: 800; cursor: pointer;">Limpiar</button>
+          <button onclick="clearAllIncomes()" style="background: none; border: none; color: #f43f5e; font-size: 11px; font-weight: 800; cursor: pointer;">Limpiar Todo</button>
         </div>
         <div id="income-list-view"></div>
       </div>
     </div>
 
-    <!-- PESTAÑA 4: MISIONES CON RECOMENDACIONES & INSIGNIAS -->
+    <!-- PESTAÑA 4: MISIONES -->
     <div id="panel-missions" class="view-section" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <div>
@@ -294,12 +318,10 @@
         <button class="btn-action-main" onclick="openNewMissionModal()">+ Misión</button>
       </div>
 
-      <!-- Misiones Activas -->
       <span style="font-size: 11px; font-weight: 900; color: #38bdf8; text-transform: uppercase;">🎯 En Progreso</span>
       <div id="missions-active-container" style="display: flex; flex-direction: column; gap: 10px; margin: 8px 0 20px;"></div>
 
-      <!-- Histórico de Insignias Cumplidas -->
-      <span style="font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase;">🏆 Muro de Insignias & Metas Cumplidas</span>
+      <span style="font-size: 11px; font-weight: 900; color: #fbbf24; text-transform: uppercase;">🏆 Muro de Insignias Cumplidas</span>
       <div id="missions-completed-container" style="margin-top: 8px;"></div>
     </div>
 
@@ -307,7 +329,7 @@
     <div id="panel-sync" class="view-section" style="display: none;">
       <div style="margin-bottom: 12px;">
         <h2 style="font-size: 16px; font-weight: 800;">Sincronización iCloud & Bancos</h2>
-        <p style="font-size: 11px; color: #94a3b8;">Automatiza con la app Atajos en tu iPhone</p>
+        <p style="font-size: 11px; color: #94a3b8;">Automatiza compras de Bancolombia/BBVA</p>
       </div>
 
       <div class="glass-card">
@@ -340,7 +362,7 @@
         </select>
 
         <label style="font-size: 11px; color: #94a3b8;">Concepto</label>
-        <input type="text" id="m-exp-title-input" placeholder="Ej. Cuota Moto / Tinto / Gasolina">
+        <input type="text" id="m-exp-title-input" placeholder="Ej. Cuota Moto / Gasolina / Tinto">
 
         <label style="font-size: 11px; color: #94a3b8;">Monto ($ COP)</label>
         <input type="number" id="m-exp-amount-input" placeholder="Ej. 800000">
@@ -386,7 +408,6 @@
   </div>
 
   <script>
-    // CLAVE DE PERSISTENCIA FIJA E INMUTABLE
     const STORAGE_KEY = 'fq_permanent_core';
 
     function loadCoreData() {
@@ -396,6 +417,7 @@
       }
       return {
         xp: 0, hp: 100, level: 1,
+        pin: '1234',
         avatarEmoji: '🥟', avatarName: 'Empanada Nea',
         skills: { STR: 10, INT: 5, DEX: 15, SPI: 10 },
         expenses: [
@@ -424,17 +446,38 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
     }
 
-    function showBackupPrompt() {
-      const dataStr = JSON.stringify(app);
-      const opt = prompt('Opciones de respaldo:\n1. Copia tu texto de respaldo (Ctrl+C)\n2. O pega un texto anterior para restaurar:', dataStr);
-      if (opt && opt !== dataStr) {
-        try {
-          const parsed = JSON.parse(opt);
-          Object.assign(app, parsed);
-          saveState();
-          location.reload();
-        } catch(e) { alert('Formato de datos no válido'); }
+    // ACCESO PARCHADO
+    function checkInputPin(val) {
+      if (val.length === 4) {
+        if (val === (app.pin || '1234')) {
+          bypassUnlock();
+        } else {
+          alert('¡Ese no es el código, parcero! Intenta de nuevo.');
+          document.getElementById('input-pin').value = '';
+        }
       }
+    }
+
+    function submitPin() {
+      const val = document.getElementById('input-pin').value;
+      if (val === (app.pin || '1234')) {
+        bypassUnlock();
+      } else {
+        alert('¡Ese no es el código, parcero! Intenta de nuevo.');
+        document.getElementById('input-pin').value = '';
+      }
+    }
+
+    function bypassUnlock() {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('input-pin').value = '';
+      showToast('¡Firme! Entraste al parche.');
+    }
+
+    function lockApp() {
+      document.getElementById('input-pin').value = '';
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('input-pin').focus();
     }
 
     function setAvatar(emoji, name, cardId) {
@@ -470,7 +513,7 @@
       const paid = list.filter(e => e.paid);
 
       if (pending.length === 0) {
-        pBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">¡Excelente! No tienes gastos pendientes en esta categoría.</p>';
+        pBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">¡Todo al día en esta lista! No tienes gastos pendientes.</p>';
       } else {
         pending.forEach(e => pBox.appendChild(createExpenseCard(e)));
       }
@@ -520,7 +563,7 @@
         it.paid = !it.paid;
         if (it.paid) {
           app.skills[it.skill] += 5;
-          gainXP(25, `¡Pago aprobado! +25 XP y +5 en ${it.sName}`);
+          gainXP(25, `¡Gasto pagado! +25 XP y +5 en ${it.sName}`);
           updateSkills();
         }
         saveState();
@@ -572,7 +615,7 @@
         saveState();
         closeExpenseModal();
         renderExpenses();
-        showToast('Gasto guardado con éxito');
+        showToast('Gasto guardado');
       } else alert('Ingresa concepto y valor válidos');
     }
 
@@ -600,19 +643,19 @@
       if (totalIncome === 0) {
         badge.className = 'tag tag-pending';
         badge.innerText = 'Esperando Q1';
-        text.innerText = '💡 Registra el cobro de tu primera quincena en la pestaña Ingresos para calibrar el flujo del mes.';
+        text.innerText = '💡 Registra el cobro de tu quincena en la pestaña Ingresos para calibrar la vuelta.';
       } else if (netProjected < 0) {
         badge.className = 'tag tag-alert';
-        badge.innerText = 'Déficit Proyectado';
-        text.innerText = `⚠️ Tus gastos pendientes superan tus ingresos por $${Math.abs(netProjected).toLocaleString('es-CO')}. Cuida la cuota de la moto y aplaza salidas no esenciales.`;
+        badge.innerText = 'Ojo al Desfase';
+        text.innerText = `⚠️ Tenés los gastos por encima de los ingresos por $${Math.abs(netProjected).toLocaleString('es-CO')}. Cuida la cuota de la moto y congela los gastos hormiga.`;
       } else if (netProjected < 500000) {
         badge.className = 'tag tag-pending';
-        badge.innerText = 'Margen Ajustado';
-        text.innerText = `🟡 Margen neto de $${netProjected.toLocaleString('es-CO')}. Te sugiero congelar compras hormiga hasta cubrir tus compromisos fijos.`;
+        badge.innerText = 'Margen Justo';
+        text.innerText = `🟡 Margen neto de $${netProjected.toLocaleString('es-CO')}. No te relajes con gastos diarios hasta asegurar los compromisos clave.`;
       } else {
         badge.className = 'tag tag-paid';
-        badge.innerText = 'Flujo Saludable';
-        text.innerText = `🚀 Cobertura sólida con un excedente de $${netProjected.toLocaleString('es-CO')}. Es un gran momento para abonar a tus misiones de Octubre.`;
+        badge.innerText = 'Coronando';
+        text.innerText = `🚀 Cobertura plena con $${netProjected.toLocaleString('es-CO')} a favor. Estás listo pa' meterle candela al ahorro de Ritvales o Paracaidismo.`;
       }
     }
 
@@ -626,7 +669,7 @@
       const completed = app.missions.filter(m => m.completed);
 
       if (active.length === 0) {
-        actBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">No hay metas activas. ¡Crea una nueva!</p>';
+        actBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 6px 0;">No hay metas activas. ¡Crea una nueva vuelta!</p>';
       } else {
         active.forEach(m => {
           const pct = Math.min(100, Math.round((m.current / m.target) * 100));
@@ -645,16 +688,16 @@
               <div style="display: flex; gap: 4px;">
                 <button onclick="openEditMission('${m.id}')" class="btn-action-sm">✏️</button>
                 <button onclick="addFundToMission('${m.id}')" class="btn-action-main" style="padding: 4px 8px; font-size: 10px;">+ Abonar</button>
-                <button onclick="claimMissionReward('${m.id}')" class="btn-action-sm" style="color: #fbbf24; border-color: #fbbf24;">🏆 Reclamar</button>
+                <button onclick="claimMissionReward('${m.id}')" class="btn-action-sm" style="color: #fbbf24; border-color: #fbbf24;">🏆 Coronar</button>
               </div>
             </div>
             <div class="bar-track" style="margin-top: 8px;">
               <div style="width: ${pct}%; height: 100%; background: #6366f1; border-radius: 99px;"></div>
             </div>
             <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 8px 10px; margin-top: 8px; font-size: 11px; color: #cbd5e1; line-height: 1.4;">
-              💡 <b>Estrategia IA:</b> Faltan $${faltante.toLocaleString('es-CO')}.<br>
-              • <b>Por Ingreso:</b> Guarda <b>$${cuotaQuincenal.toLocaleString('es-CO')}</b> de tus próximas 2 quincenas.<br>
-              • <b>Por Gasto:</b> O recorta <b>$${recorteDiario.toLocaleString('es-CO')}/día</b> en gastos diarios durante 30 días.
+              💡 <b>Estrategia Nea:</b> Faltan $${faltante.toLocaleString('es-CO')}.<br>
+              • <b>Por Quincena:</b> Aparta <b>$${cuotaQuincenal.toLocaleString('es-CO')}</b> de tus próximas 2 quincenas.<br>
+              • <b>Por Día:</b> O recorta <b>$${recorteDiario.toLocaleString('es-CO')}/día</b> en tintos y antojos durante 30 días.
             </div>
           `;
           actBox.appendChild(div);
@@ -662,7 +705,7 @@
       }
 
       if (completed.length === 0) {
-        compBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 4px 0;">Cumple una meta para exhibir aquí tu primera insignia.</p>';
+        compBox.innerHTML = '<p style="font-size: 11px; color: #94a3b8; padding: 4px 0;">Cumple una meta para ganar tu primera insignia.</p>';
       } else {
         completed.forEach(m => {
           const mdiv = document.createElement('div');
@@ -671,12 +714,12 @@
             <div style="display: flex; gap: 10px; align-items: center;">
               <span style="font-size: 26px;">🎖️</span>
               <div>
-                <b style="font-size: 13px; color: #fbbf24;">${m.badge || '🏆 Conquistador'}</b>
+                <b style="font-size: 13px; color: #fbbf24;">${m.badge || '🏆 Misión Coronada'}</b>
                 <p style="font-size: 11px; color: #cbd5e1; margin-top: 1px;">${m.title} &bull; $${m.target.toLocaleString('es-CO')}</p>
               </div>
             </div>
             <div style="display: flex; gap: 4px;">
-              <span class="tag tag-paid">Cumplida</span>
+              <span class="tag tag-paid">Coronada</span>
               <button onclick="deleteMission('${m.id}')" class="btn-action-sm" style="color: #f43f5e;">🗑️</button>
             </div>
           `;
@@ -691,11 +734,11 @@
       const m = app.missions.find(x => x.id === id);
       if (m) {
         if (m.current < m.target) {
-          if (!confirm(`Aún faltan $${(m.target - m.current).toLocaleString('es-CO')}. ¿Deseas marcarla como cumplida y reclamar la insignia?`)) return;
+          if (!confirm(`Faltan $${(m.target - m.current).toLocaleString('es-CO')}. ¿Deseas marcarla como cumplida y reclamar la medalla?`)) return;
         }
         m.completed = true;
         m.current = m.target;
-        gainXP(100, `🏆 ¡META CUMPLIDA! Desbloqueaste la insignia "${m.badge || 'Victoria'}" (+100 XP)`);
+        gainXP(100, `🏆 ¡CORONASTE LA META! Ganaste la medalla "${m.badge || 'Victoria'}" (+100 XP)`);
         saveState();
         renderMissions();
       }
@@ -749,7 +792,7 @@
         saveState();
         renderMissions();
         closeMissionModal();
-        showToast('Meta guardada con éxito');
+        showToast('Meta guardada');
       } else alert('Ingresa título y meta válidos');
     }
 
@@ -766,6 +809,7 @@
       }
     }
 
+    // INGRESOS
     function renderIncomes() {
       const box = document.getElementById('income-list-view');
       box.innerHTML = '';
@@ -787,9 +831,10 @@
             <span class="tag ${inc.alert ? 'tag-alert' : 'tag-paid'}" style="margin-left: 4px;">${inc.alert ? 'POR COBRAR' : 'RECIBIDO'}</span>
             <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;">${inc.date}</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
             <b style="color: ${inc.alert ? '#fb7185' : '#34d399'}; font-size: 14px;">+$${inc.amount.toLocaleString('es-CO')}</b>
-            <button onclick="deleteIncome(${idx})" style="background:none; border:none; color:#f43f5e; cursor:pointer; font-size: 14px;">🗑️</button>
+            <button onclick="editIncome(${idx})" style="background:none; border:none; color:#38bdf8; cursor:pointer; font-size:13px;">✏️</button>
+            <button onclick="deleteIncome(${idx})" style="background:none; border:none; color:#f43f5e; cursor:pointer; font-size:14px;">🗑️</button>
           </div>
         `;
         box.appendChild(row);
@@ -798,7 +843,7 @@
     }
 
     function addIncomePrompt(title, defAmt) {
-      const val = prompt(`Monto a ingresar para ${title} ($ COP):`, defAmt);
+      const val = prompt(`Monto para ${title} ($ COP):`, defAmt);
       if (val && !isNaN(val)) {
         app.incomes.unshift({ title, amount: parseInt(val), date: 'Registrado', alert: false });
         gainXP(25, `+$${parseInt(val).toLocaleString('es-CO')} ingresados (+25 XP)`);
@@ -820,11 +865,28 @@
       }
     }
 
+    function editIncome(idx) {
+      const item = app.incomes[idx];
+      const newTitle = prompt('Concepto del ingreso:', item.title);
+      if (newTitle) {
+        const newAmt = prompt('Monto ($ COP):', item.amount);
+        if (newAmt && !isNaN(newAmt)) {
+          item.title = newTitle;
+          item.amount = parseInt(newAmt);
+          saveState();
+          renderIncomes();
+          showToast('Ingreso actualizado');
+        }
+      }
+    }
+
     function deleteIncome(idx) {
-      app.incomes.splice(idx, 1);
-      saveState();
-      renderIncomes();
-      showToast('Registro eliminado');
+      if (confirm(`¿Eliminar ingreso "${app.incomes[idx].title}"?`)) {
+        app.incomes.splice(idx, 1);
+        saveState();
+        renderIncomes();
+        showToast('Ingreso eliminado');
+      }
     }
 
     function clearAllIncomes() {
@@ -881,7 +943,7 @@
     }
 
     function resetDataPrompt() {
-      if (confirm('¿Deseas restablecer las estadísticas a los valores iniciales?')) {
+      if (confirm('¿Deseas restablecer la aplicación a los valores iniciales?')) {
         localStorage.removeItem(STORAGE_KEY);
         location.reload();
       }
